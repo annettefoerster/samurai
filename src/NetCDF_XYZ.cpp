@@ -160,8 +160,8 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     	return NC_ERR; 
     if (!(dpipdzVar = dataFile.get_var("dpipdz")))
     	return NC_ERR; 
-    if (!(trpVar = dataFile.get_var("trp")))
-    	return NC_ERR; 
+    //if (!(trpVar = dataFile.get_var("trp")))
+    //	return NC_ERR; 
                 	
     if (!uVar->set_cur(NREC, 0, 0, 0))
 		return NC_ERR;
@@ -204,8 +204,8 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     if (!vpVar->set_cur(NREC, 0, 0, 0))
     	return NC_ERR; 
 
-    if (!trpVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR; 
+    //if (!trpVar->set_cur(NREC, 0, 0, 0))
+    //return NC_ERR; 
     if (!dpipdxVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR; 
     if (!dpipdyVar->set_cur(NREC, 0, 0, 0))
@@ -254,8 +254,8 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
   if (!vpVar->get(vprime, 1, NALT, NLAT, NLON))
     return NC_ERR; 	
 
-  if (!trpVar->get(thetarhoprime, 1, NALT, NLAT, NLON))
-    return NC_ERR; 
+  //if (!trpVar->get(thetarhoprime, 1, NALT, NLAT, NLON))
+  //  return NC_ERR; 
   if (!dpipdxVar->get(dpiprimedx, 1, NALT, NLAT, NLON))
     return NC_ERR; 
   if (!dpipdyVar->get(dpiprimedy, 1, NALT, NLAT, NLON))

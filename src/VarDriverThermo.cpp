@@ -371,17 +371,6 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       float c_p = 1005.7;
       float g = 9.81;
       
-      /* Test the residual
-      double a_residual = -c_p*thetarhobar*dpipdr -c_p*dpibardr*thetarhop - a;
-      double b_residual = -c_p*thetarhobar*dpipdlambda/r - b;
-      double c_residual =	-c_p*thetarhobar*dpipdz + g*thetarhop/thetarhobar - c; 	
-      double d_residual = dtrpdr*u + dtrpdlambda*v/r + dtrpdz*w - d;
-      
-      cout << "A: " << a_residual << "\n";
-      cout << "B: " << b_residual << "\n";
-      cout << "C: " << c_residual << "\n";
-      cout << "D: " << d_residual << "\n";						 
-      double scaling1 = 1000000000.0; */
       double scaling = 1000.0;
           
       varOb.setOb(a*scaling);
@@ -491,64 +480,7 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
         std::cout << "Skip this ... \n";}
 
       float c_p = 1005.7;
-      float g = 9.81*1000.0;
-
-      /*double dpipdx    = ncFile->getValue(i,j,k,(QString)"dpipdx");
-      double dpipdy    = ncFile->getValue(i,j,k,(QString)"dpipdy");
-      double dpipdz    = ncFile->getValue(i,j,k,(QString)"dpipdz");
-      double thetarhop = ncFile->getValue(i,j,k,(QString)"trp");
-      
-
-      
-      double u = ncFile->getValue(i,j,k,(QString)"u");
-      double dwdx = ncFile->getValue(i,j,k,(QString)"dwdx");
-      double v = ncFile->getValue(i,j,k,(QString)"v");	
-      double dwdy = ncFile->getValue(i,j,k,(QString)"dwdy");
-      double w = ncFile->getValue(i,j,k,(QString)"w");	
-      double dwdz = ncFile->getValue(i,j,k,(QString)"dwdz");
-      double azimuth = ncFile->getValue(i,j,k,(QString)"az");	
-      double vtbar = ncFile->getValue(i,j,k,(QString)"vtb");
-      double radius = ncFile->getValue(i,j,k,(QString)"r");	
-      double uprime = ncFile->getValue(i,j,k,(QString)"up");  
-      
-      double f = 0.448432045656147e-05;
-      
-      double c1 = u*dwdx;
-      double c2 = v*dwdy;
-      double c3 = w*dwdz;
-      double c6 = -c_p*thetarhobar*dpipdz;
-      double c7 = g*thetarhop/thetarhobar;
-
-      
-      //Test the residual
-      double a_right = -c_p*dpipdx -c_p*dpibardx*thetarhop;
-      double b_right = -c_p*dpipdy - c_p*thetarhop/thetarhobar*dpipdy;
-      double c_right = -c_p*dpipdz + g*thetarhop/thetarhobar/thetarhobar; 	
-
-      double a_residual = a_right - a;
-      double b_residual = b_right - b;
-      double c_residual =	c_right - c; 
-
-      cout << "c1: " << c1 << "\n";
-      cout << "c2: " << c2 << "\n";
-      cout << "c3: " << c3 << "\n";
-      cout << "c6: " << c6 << "\n";
-      cout << "c7: " << c7 << "\n";
-
-            
-     // cout << "A left: " << a << "\n";
-     // cout << "A right: " << a_right << "\n";
-     // cout << "A res: " << a_residual << "\n";
-
-     // cout << "B: " << b << "\n";
-    //  cout << "B right: " << b_right << "\n";      
-    //  cout << "B res: " << b_residual << "\n";
-      
-      cout << "C: " << c << "\n";     
-      cout << "C right: " << c_right << "\n";       
-      cout << "C res: " << c_residual << "\n";*/
-      
-      //		
+      float g = 9.81*1000.0;		
       
       varOb.setOb(a);
       //varOb.setWeight(-c_p*thetarhobar,0,1);	
@@ -575,15 +507,15 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       varOb.setWeight(0,1,0);
       
       
-      varOb.setOb(d);
-      varOb.setWeight(-u,1,1);
-      varOb.setWeight(-v,1,2);
-      varOb.setWeight(-w,1,3);
-      varOb.setError(configHash.value("thermo_D_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,1);	
-      varOb.setWeight(0,1,2);
-      varOb.setWeight(0,1,3);
+      //varOb.setOb(d);
+      //varOb.setWeight(-u,1,1);
+      //varOb.setWeight(-v,1,2);
+      //varOb.setWeight(-w,1,3);
+      //varOb.setError(configHash.value("thermo_D_error").toFloat());
+      //obVector->push_back(varOb);
+      //varOb.setWeight(0,1,1);	
+      //varOb.setWeight(0,1,2);
+      //varOb.setWeight(0,1,3);
       
       
         }
