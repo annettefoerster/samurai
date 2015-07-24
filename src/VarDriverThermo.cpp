@@ -171,7 +171,8 @@ bool VarDriverThermo::initialize(const QDomElement& configuration)
     		
 	/* Optionally load a set of background estimates and interpolate to the Gaussian mish */
 	
-	QString metFile = "20050920_18.nc";
+	//QString metFile = "20050921_18.nc";
+	metFile = configHash.value("infile");
 	
 	if(!this->loadObservations(metFile, &obVector)) {
 	// For testing purposes, comment out line above and use this one instead: if(!this->testing(&obVector)) {
@@ -284,8 +285,8 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
   cout << "Load Observations ... " << endl;
   
   int nalt = 33;
-  int nx = 51;
-  int ny = 51;
+  int nx = 76;
+  int ny = 76;
   
   QString file,datestr,timestr;
   file = metFile.section("/",-1);  
@@ -416,11 +417,11 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
     
     int nlon = nx;
     int nlat = ny;
-    //for (int i = 40; i < 51; ++i) {
-    //  for (int j = 30; j < 41; ++j) {
+    //for (int i = 40; i < nlon; ++i) {
+    //  for (int j = 30; j < nlat; ++j) {
     //    for (int k = 1; k < 20; ++k) {
-    for (int i = 0; i < nlon; ++i) {
-      for (int j = 0; j < nlat; ++j) {
+    for (int i = 5; i < 71; ++i) {
+      for (int j = 5; j < 71; ++j) {
         for (int k = 6; k < 19; ++k) {
           Observation varOb;
           
@@ -541,7 +542,7 @@ bool VarDriverThermo::testing(QList<Observation>* obVector)
  //Solution: x_1 = 1, x_2 = -2, x_3 = -2
  
   QString file,datestr,timestr;  
-  file = "20050920_18.nc";
+  file = "20050921_18.nc";
   datestr = file.left(8);
   QDate date = QDate::fromString(datestr, "yyyyMMdd");
   timestr = file.section("_",-1).section(".",0,0);
@@ -633,7 +634,7 @@ bool VarDriverThermo::testing_rtz(QList<Observation>* obVector)
 {
  
   QString file,datestr,timestr;  
-  file = "20050920_18.nc";
+  file = "20050921_18.nc";
   datestr = file.left(8);
   QDate date = QDate::fromString(datestr, "yyyyMMdd");
   timestr = file.section("_",-1).section(".",0,0);

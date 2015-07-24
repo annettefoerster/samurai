@@ -44,6 +44,7 @@ public:
 	bool finalize();
   bool testing(QList<Observation>* obVector);
   bool testing_rtz(QList<Observation>* obVector);
+  
 
 	
 private:
@@ -51,6 +52,7 @@ private:
    CostFunctionThermo* obCost3D;
    bool loadObservations(QString& metFile, QList<Observation>* obVector);
    NetCDF* ncFile;
+   QString metFile;
    QList<Observation> obVector;
    
    real* obs;

@@ -18,8 +18,8 @@ NetCDF::NetCDF() :c_p(1005.7), g(9.81), f(0.448432045656147e-05), pi(3.141592653
  {
 	NDIMS = 4;
 	NALT = 33;
-	NX = 51;      // NRADIUS or NLON
-	NY = 51;      // NTHETA or NLAT
+	NX = 76;      // NRADIUS or NLON
+	NY = 76;      // NTHETA or NLAT
 	NREC = 0;
 	NC_ERR = 2;
   std::cout << "Constructor \n";
