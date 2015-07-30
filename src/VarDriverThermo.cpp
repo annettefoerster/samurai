@@ -285,8 +285,8 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
   cout << "Load Observations ... " << endl;
   
   int nalt = 33;
-  int nx = 76;
-  int ny = 76;
+  int nx = 151;
+  int ny = 151;
   
   QString file,datestr,timestr;
   file = metFile.section("/",-1);  
@@ -420,8 +420,8 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
     //for (int i = 40; i < nlon; ++i) {
     //  for (int j = 30; j < nlat; ++j) {
     //    for (int k = 1; k < 20; ++k) {
-    for (int i = 5; i < 71; ++i) {
-      for (int j = 5; j < 71; ++j) {
+    for (int i = 5; i < 145; ++i) {
+      for (int j = 5; j < 145; ++j) {
         for (int k = 6; k < 19; ++k) {
           Observation varOb;
           
@@ -483,21 +483,21 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       float c_p = 1005.7;
       float g = 9.81*1000.0;		
       
-      varOb.setOb(a);
-      //varOb.setWeight(-c_p*thetarhobar,0,1);	
-      varOb.setWeight(-c_p*dpibardx,1,0);		
-      varOb.setError(configHash.value("thermo_A_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,0,1);
-      varOb.setWeight(0,1,0);
+      //varOb.setOb(a);
+      ////varOb.setWeight(-c_p*thetarhobar,0,1);	
+      //varOb.setWeight(-c_p*dpibardx,1,0);		
+      //varOb.setError(configHash.value("thermo_A_error").toFloat());
+      //obVector->push_back(varOb);
+      //varOb.setWeight(0,0,1);
+      //varOb.setWeight(0,1,0);
       
-      varOb.setOb(b);
-      //varOb.setWeight(-c_p*thetarhobar,0,2);	
-      varOb.setWeight(-c_p*dpibardy,1,0);		
-      varOb.setError(configHash.value("thermo_B_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,0,2);
-      varOb.setWeight(0,1,0);
+      //varOb.setOb(b);
+      ////varOb.setWeight(-c_p*thetarhobar,0,2);	
+      //varOb.setWeight(-c_p*dpibardy,1,0);		
+      //varOb.setError(configHash.value("thermo_B_error").toFloat());
+      //obVector->push_back(varOb);
+      //varOb.setWeight(0,0,2);
+      //varOb.setWeight(0,1,0);
       
       varOb.setOb(c);
       //varOb.setWeight(-c_p*thetarhobar,0,3);
