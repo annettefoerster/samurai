@@ -355,7 +355,7 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
 	double vtbar = this->getValue(i,j,k,(QString)"vtb");
 	double radius = this->getValue(i,j,k,(QString)"r");	
 	double vprime = this->getValue(i,j,k,(QString)"vp");  
-  //double dpibdx = this->getValue(i,j,k,(QString)"dpibdx");
+   double dpibdx = this->getValue(i,j,k,(QString)"dpibdx");
   //double trp = this->getValue(i,j,k,(QString)"trp");
   double dpipdx = this->getValue(i,j,k,(QString)"dpipdx");
   float c_p = 1005.7;
@@ -365,7 +365,7 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
   
   //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime);
   //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime)+c_p*dpibdx*trp;		//If pip only
-  double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime)+c_p*thetarhobar*dpipdx;   //If trp only  
+  double a = (u*dudx+v*dudy+w*dudz-f*vtbar*cos(azimuth)-f*vprime)+c_p*thetarhobar*dpibdx;   // trp neglected
   
 	return a;	
 }
@@ -384,7 +384,7 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
 	double vtbar = this->getValue(i,j,k,(QString)"vtb");
 	double radius = this->getValue(i,j,k,(QString)"r");	
 	double uprime = this->getValue(i,j,k,(QString)"up"); 
-  //double dpibdy = this->getValue(i,j,k,(QString)"dpibdy");
+   double dpibdy = this->getValue(i,j,k,(QString)"dpibdy");
 	//double trp = this->getValue(i,j,k,(QString)"trp");
   double dpipdy = this->getValue(i,j,k,(QString)"dpipdy");
   float c_p = 1005.7;
@@ -394,7 +394,7 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
     
   //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime);
   //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime)+c_p*dpibdy*trp;   //If pip only
-  double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime)+c_p*thetarhobar*dpipdy;   //If trp only
+  double b = (u*dvdx+v*dvdy+w*dvdz-f*vtbar*sin(azimuth)+f*uprime)+c_p*thetarhobar*dpibdy;   // trp neglected
   return b;	
 }
 
@@ -414,9 +414,9 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
   if (thetarhobar==-999 or u==-999 or dwdx==-999 or v==-999 or dwdy==-999 or w==-999 or dwdz==-999){
     return -999;}
 
-  //double c = (u*dwdx+v*dwdy+w*dwdz);
+  double c = (u*dwdx+v*dwdy+w*dwdz);
   //double c = (u*dwdx+v*dwdy+w*dwdz)-g/thetarhobar*trp;    //If pip only
-  double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
+ // double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
 
   return c;	
 }
