@@ -319,7 +319,7 @@ bool VarDriver3D::preProcessMetObs()
 
 
 	// Geographic functions
-	GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM();
+	GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM;
 	real referenceLon = configHash.value("ref_lon").toFloat();
 
     // Find the zero C line using Newton's method
@@ -1561,7 +1561,7 @@ int VarDriver3D::loadBackgroundObs()
     // SplineD::Debug(1);
 
     // Geographic functions
-    GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM();
+    GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM;
     real referenceLon = configHash.value("ref_lon").toFloat();
 
     QVector<real> logheights, uBG, vBG, wBG, tBG, qBG, rBG, zBG;

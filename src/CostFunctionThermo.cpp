@@ -203,7 +203,7 @@ void CostFunctionThermo::initState(const int iteration)
 	setupSplines();
 
 	// Flag whether or not to print the subgrid information
-	outputMish = configHash->value("output_mish").toInt();
+	mishFlag = configHash->value("output_mish").toInt();
 	
 	// Mass continuity weight
   mcWeight = configHash->value("mc_weight").toFloat();

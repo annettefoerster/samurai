@@ -34,20 +34,20 @@ bool CostFunctionThermoRTZ::outputAnalysis(const QString& suffix, real* Astate)
 
     real Pi = acos(-1.0);
     for (int iIndex = 1; iIndex < iDim-1; iIndex++) {
-        for (int ihalf = 0; ihalf <= outputMish; ihalf++) {
+        for (int ihalf = 0; ihalf <= mishFlag; ihalf++) {
             for (int imu = -ihalf; imu <= ihalf; imu++) {
                 real i = iMin + DI * (iIndex + (0.5*sqrt(1./3.) * imu + 0.5*ihalf));
                 real r = i*1000;
                 if (i > ((iDim-1)*DI + iMin)) continue;
 
                 for (int jIndex = 1; jIndex < jDim-1; jIndex++) {
-                    for (int jhalf =0; jhalf <=outputMish; jhalf++) {
+                    for (int jhalf =0; jhalf <=mishFlag; jhalf++) {
                         for (int jmu = -jhalf; jmu <= jhalf; jmu++) {
                             real j = jMin + DJ * (jIndex + (0.5*sqrt(1./3.) * jmu + 0.5*jhalf));
                             if (j > ((jDim-1)*DJ + jMin)) continue;
 
                             for (int kIndex = 1; kIndex < kDim-1; kIndex++) {
-                                for (int khalf =0; khalf <=outputMish; khalf++) {
+                                for (int khalf =0; khalf <=mishFlag; khalf++) {
                                     for (int kmu = -khalf; kmu <= khalf; kmu++) {
                                         real k = kMin + DK * (kIndex + (0.5*sqrt(1./3.) * kmu + 0.5*khalf));
                                         if (k > ((kDim-1)*DK + kMin)) continue;
