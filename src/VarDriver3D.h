@@ -33,7 +33,7 @@ class VarDriver3D : public VarDriver
 public:
 	VarDriver3D();
 	~VarDriver3D();
-	
+
 	// ESMF type calls
 	virtual bool initialize(const QDomElement& configuration);
 	virtual bool run();
@@ -42,24 +42,25 @@ public:
 protected:
 	typedef BSplineBase<real> SplineBase;
 	typedef BSpline<real> SplineD;
-	
+
 	// Common methods
 	bool preProcessMetObs();
 	bool loadMetObs();
 	bool loadBGfromFile();
 	int loadBackgroundObs();
+	int loadBackgroundCoeffs();
 	bool adjustBackground(const int& bStateSize);
 	void updateAnalysisParams(const int& iteration);
 	bool validateXMLconfig();
-	
+
 	QList<real> bgIn;
 	QList<Observation> obVector;
 	int maxIter;
-    
+
 	// Cost Functions
 	CostFunction3D* obCost3D;
 	CostFunction3D* bgCost3D;
-	
+
 	// Variables passed to Cost function
 	real* bgB;
 	real* bgU;
@@ -69,12 +70,12 @@ protected:
 	real imin, imax, jmin, jmax, kmin, kmax;
 	real iincr;
 	real jincr;
-	real kincr;	
+	real kincr;
 	int idim;
 	int jdim;
 	int kdim;
     int runMode;
-    
+
     enum RunModes {
         XYZ,
         RTZ

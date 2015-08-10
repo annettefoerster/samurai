@@ -37,7 +37,7 @@ public:
 	virtual bool finalize() = 0;
 
 protected:
-	
+
 	real CoriolisF;
 	real Pi;
 	unsigned int numVars;
@@ -50,7 +50,7 @@ protected:
 	vector<FrameCenter> frameVector;
 	QDomDocument domDoc;
 	QHash<QString, QString> configHash;
-	ReferenceState* refstate;    
+	ReferenceState* refstate;
 	// Data Processing
 	QHash<QString, int> dataSuffix;
 	QDir dataPath;
@@ -75,7 +75,8 @@ protected:
         mesonet,
         classnc,
         qcf,
-        aeri
+        aeri,
+				rad
 	};
 
 	bool read_frd(QFile& metFile, QList<MetObs>* metObVector);
@@ -97,6 +98,7 @@ protected:
     bool read_classnc(QFile& metFile, QList<MetObs>* metObVector);
     bool read_qcf(QFile& metFile, QList<MetObs>* metObVector);
     bool read_aeri(QFile& metFile, QList<MetObs>* metObVector);
+	bool read_rad(QFile& metFile, QList<MetObs>* metObVector);
 	bool readFrameCenters();
 	bool parseXMLconfig(const QDomElement& config);
 
