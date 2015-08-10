@@ -469,6 +469,8 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       double dpibardx    = ncFile->getValue(i,j,k,(QString)"dpibdx");
       double dpibardy    = ncFile->getValue(i,j,k,(QString)"dpibdy");
       
+      double pip = ncFile->getValue(i,j,k,(QString)"pip");      
+      
       double u = ncFile->getValue(i,j,k,(QString)"u");
       double v = ncFile->getValue(i,j,k,(QString)"v");
       double w = ncFile->getValue(i,j,k,(QString)"w");
@@ -481,7 +483,7 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
         std::cout << "Skip this ... \n";}
 
       float c_p = 1005.7;
-      float g = 9.81*1000.0;		
+      float g = 9.81;		
       
       varOb.setOb(a);
       varOb.setWeight(-c_p*thetarhobar,0,1);	
@@ -502,13 +504,27 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       varOb.setOb(c);
       varOb.setWeight(-c_p*thetarhobar,0,3);
       varOb.setWeight(g/thetarhobar,1,0);
+      varOb.setWeight(-c_p*thetarhobar,2,3);
       varOb.setError(configHash.value("thermo_C_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,3);	
       varOb.setWeight(0,1,0);
+      varOb.setWeight(0,2,3);
       
       
-      varOb.setOb(d);
++      if ((i==40 and j==40) or (i==60 and j==60) or (i==80 and j==80) or (i==100 and j==100)) {   
++          varOb.setOb(pip-0.00025);
++          varOb.setWeight(1,0,0);
++          varOb.setWeight(1,2,0);
++          varOb.setError(configHash.value("thermo_D_error").toFloat());
++          obVector->push_back(varOb);
++          varOb.setWeight(0,0,0);      
++          varOb.setWeight(0,2,0);
++      }    
++        
+      
+      
+   /*   varOb.setOb(d);
       varOb.setWeight(-u,1,1);
       varOb.setWeight(-v,1,2);
       varOb.setWeight(-w,1,3);
@@ -519,7 +535,7 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       varOb.setWeight(0,1,2);
       varOb.setWeight(0,1,3);
       varOb.setWeight(0,2,0);
-      
+      */
       
         }
       }

@@ -52,7 +52,7 @@ protected:
   float* thetarhobar;
 	float* dpibardx;
 	float* dpibardy;
-	float* azimuth;
+	float* pip;
 	float* radius;
 	float* vtbar;
   float* uprime;

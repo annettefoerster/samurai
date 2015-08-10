@@ -40,7 +40,7 @@ NetCDF_XYZ::NetCDF_XYZ()
 	thetarhobar = new float[NALT*NLON*NLAT];	
   dpibardx = new float[NALT*NLON*NLAT];	
   dpibardy = new float[NALT*NLON*NLAT];	
-  azimuth = new float[NALT*NLON*NLAT];	
+  pip = new float[NALT*NLON*NLAT];	
   radius = new float[NALT*NLON*NLAT];	
   vtbar = new float[NALT*NLON*NLAT];	
   uprime = new float[NALT*NLON*NLAT];	
@@ -73,7 +73,7 @@ NetCDF_XYZ::~NetCDF_XYZ()
   delete[] thetarhobar;
   delete[] dpibardx;
   delete[] dpibardy;
-  delete[] azimuth;
+  delete[] pip;
   delete[] radius;
   delete[] vtbar;
   delete[] uprime;
@@ -111,7 +111,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     	return NC_ERR;
 
      // Get pointers to the pressure and temperature variables.
-    NcVar *uVar,*vVar,*wVar,*dudxVar,*dvdxVar,*dwdxVar,*dudyVar,*dvdyVar,*dwdyVar,*dudzVar,*dvdzVar,*dwdzVar, *trbVar, *dpibdxVar, *dpibdyVar, *azVar, *rVar, *vtbVar, *upVar, *vpVar, *trpVar, *dpipdxVar, *dpipdyVar, *dpipdzVar;
+    NcVar *uVar,*vVar,*wVar,*dudxVar,*dvdxVar,*dwdxVar,*dudyVar,*dvdyVar,*dwdyVar,*dudzVar,*dvdzVar,*dwdzVar, *trbVar, *dpibdxVar, *dpibdyVar, *pipVar, *rVar, *vtbVar, *upVar, *vpVar, *trpVar, *dpipdxVar, *dpipdyVar, *dpipdzVar;
 
     if (!(uVar = dataFile.get_var("u")))
     	return NC_ERR;
@@ -143,7 +143,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     	return NC_ERR; 
     if (!(dpibdyVar = dataFile.get_var("dpibdy")))
     	return NC_ERR; 
-    if (!(azVar = dataFile.get_var("az")))
+    if (!(pipVar = dataFile.get_var("pip")))
     	return NC_ERR; 
     if (!(rVar = dataFile.get_var("r")))
     	return NC_ERR;       
@@ -193,7 +193,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     return NC_ERR; 
     if (!dpibdyVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR; 
-    if (!azVar->set_cur(NREC, 0, 0, 0))
+    if (!pipVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR; 
     if (!rVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR;       
@@ -243,7 +243,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     return NC_ERR; 
   if (!dpibdyVar->get(dpibardy, 1, NALT, NLAT, NLON))
     return NC_ERR; 
-  if (!azVar->get(azimuth, 1, NALT, NLAT, NLON))
+  if (!pipVar->get(pip, 1, NALT, NLAT, NLON))
     return NC_ERR; 
   if (!rVar->get(radius, 1, NALT, NLAT, NLON))
     return NC_ERR;       
@@ -283,11 +283,11 @@ double NetCDF_XYZ::getValue(const int &i,const int &j,const int &k, const QStrin
 	} else if (varName=="z") {
 	value_out= altitude[k]*1000.0;
 	} else if (varName=="u") {
-	value_out= u[k*NLAT*NLON + j*NLAT + i]*1000.0;
+	value_out= u[k*NLAT*NLON + j*NLAT + i];
 	} else if (varName=="v") {
-	value_out= v[k*NLAT*NLON + j*NLAT + i]*1000.0;
+	value_out= v[k*NLAT*NLON + j*NLAT + i];
 	} else if (varName=="w") {
-	value_out= w[k*NLAT*NLON + j*NLAT + i]*1000.0;	
+	value_out= w[k*NLAT*NLON + j*NLAT + i];	
 	} else if (varName=="dudx") {
 	value_out= dudx[k*NLAT*NLON + j*NLAT + i]/1.0E5;	
 	} else if (varName=="dvdx") {
@@ -309,26 +309,26 @@ double NetCDF_XYZ::getValue(const int &i,const int &j,const int &k, const QStrin
 	} else if (varName=="trb") {
 	value_out= thetarhobar[k*NLAT*NLON + j*NLAT + i];	
 	} else if (varName=="dpibdx") {
-	value_out= dpibardx[k*NLAT*NLON + j*NLAT + i];	
+	value_out= dpibardx[k*NLAT*NLON + j*NLAT + i]/1000.0;	
 	} else if (varName=="dpibdy") {
-	value_out= dpibardy[k*NLAT*NLON + j*NLAT + i];	 
-	} else if (varName=="az") {
-	value_out= azimuth[k*NLAT*NLON + j*NLAT + i];	
+	value_out= dpibardy[k*NLAT*NLON + j*NLAT + i]/1000.0;	 
+	} else if (varName=="pip") {
+	value_out= pip[k*NLAT*NLON + j*NLAT + i];	
 	} else if (varName=="r") {
-	value_out= radius[k*NLAT*NLON + j*NLAT + i];	
+	value_out= radius[k*NLAT*NLON + j*NLAT + i]*1000.0;	
 	} else if (varName=="vtb") {
 	value_out= vtbar[k*NLAT*NLON + j*NLAT + i];	
 	} else if (varName=="up") {
-	value_out= uprime[k*NLAT*NLON + j*NLAT + i]*1000.0;	
+	value_out= uprime[k*NLAT*NLON + j*NLAT + i];	
 	} else if (varName=="vp") {
-	value_out= vprime[k*NLAT*NLON + j*NLAT + i]*1000.0;	
+	value_out= vprime[k*NLAT*NLON + j*NLAT + i];	
  
 	} else if (varName=="dpipdx") {
-	value_out= dpiprimedx[k*NLAT*NLON + j*NLAT + i];	
+	value_out= dpiprimedx[k*NLAT*NLON + j*NLAT + i]/1000.0;	
 	} else if (varName=="dpipdy") {
-	value_out= dpiprimedy[k*NLAT*NLON + j*NLAT + i];	  
+	value_out= dpiprimedy[k*NLAT*NLON + j*NLAT + i]/1000.0;	  
 	} else if (varName=="dpipdz") {
-	value_out= dpiprimedz[k*NLAT*NLON + j*NLAT + i];
+	value_out= dpiprimedz[k*NLAT*NLON + j*NLAT + i]/1000.0;
 	} else if (varName=="trp") {
 	value_out= thetarhoprime[k*NLAT*NLON + j*NLAT + i];	 
    
@@ -351,7 +351,7 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
 	double dudy = this->getValue(i,j,k,(QString)"dudy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dudz = this->getValue(i,j,k,(QString)"dudz");
-	double azimuth = this->getValue(i,j,k,(QString)"az");	
+	//double azimuth = this->getValue(i,j,k,(QString)"az");	
 	double vtbar = this->getValue(i,j,k,(QString)"vtb");
 	double radius = this->getValue(i,j,k,(QString)"r");	
 	double vprime = this->getValue(i,j,k,(QString)"vp");  
@@ -360,12 +360,12 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
   double dpipdx = this->getValue(i,j,k,(QString)"dpipdx");
   float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dudx==-999 or v==-999 or dudy==-999 or w==-999 or dudz==-999 or azimuth==-999 or vtbar==-999 or radius==-999 or vprime==-999){
+  if (thetarhobar==-999 or u==-999 or dudx==-999 or v==-999 or dudy==-999 or w==-999 or dudz==-999 or vtbar==-999 or radius==-999 or vprime==-999){
     return -999;}
   
   //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime);
   //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime)+c_p*dpibdx*trp;		//If pip only
-  double a = (u*dudx+v*dudy+w*dudz-f*vtbar*cos(azimuth)-f*vprime)+c_p*thetarhobar*dpibdx;   // trp neglected
+  double a = (u*dudx+v*dudy+w*dudz-f*v)+c_p*thetarhobar*dpibdx;   // trp neglected
   
 	return a;	
 }
@@ -380,7 +380,7 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
 	double dvdy = this->getValue(i,j,k,(QString)"dvdy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dvdz = this->getValue(i,j,k,(QString)"dvdz");
-	double azimuth = this->getValue(i,j,k,(QString)"az");	
+	//double azimuth = this->getValue(i,j,k,(QString)"az");	
 	double vtbar = this->getValue(i,j,k,(QString)"vtb");
 	double radius = this->getValue(i,j,k,(QString)"r");	
 	double uprime = this->getValue(i,j,k,(QString)"up"); 
@@ -389,12 +389,13 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
   double dpipdy = this->getValue(i,j,k,(QString)"dpipdy");
   float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dvdx==-999 or v==-999 or dvdy==-999 or w==-999 or dvdz==-999 or azimuth==-999 or vtbar==-999 or radius==-999 or uprime==-999){
+  if (thetarhobar==-999 or u==-999 or dvdx==-999 or v==-999 or dvdy==-999 or w==-999 or dvdz==-999 or vtbar==-999 or radius==-999 or uprime==-999){
     return -999;}
     
   //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime);
   //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime)+c_p*dpibdy*trp;   //If pip only
-  double b = (u*dvdx+v*dvdy+w*dvdz-f*vtbar*sin(azimuth)+f*uprime)+c_p*thetarhobar*dpibdy;   // trp neglected
+  double b = (u*dvdx+v*dvdy+w*dvdz+f*u)+c_p*thetarhobar*dpibdy;   // trp neglected
+
   return b;	
 }
 
@@ -409,7 +410,7 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
 	double dwdz = this->getValue(i,j,k,(QString)"dwdz");
   double dpipdz = this->getValue(i,j,k,(QString)"dpipdz");
 	//double trp = this->getValue(i,j,k,(QString)"trp");
-  float g = 9.81*1000.0;
+  float g = 9.81;
   
   if (thetarhobar==-999 or u==-999 or dwdx==-999 or v==-999 or dwdy==-999 or w==-999 or dwdz==-999){
     return -999;}
