@@ -417,11 +417,14 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
     
     int nlon = nx;
     int nlat = ny;
-    //for (int i = 40; i < nlon; ++i) {
-    //  for (int j = 30; j < nlat; ++j) {
-    //    for (int k = 1; k < 20; ++k) {
-    for (int i = 5; i < 145; ++i) {
-      for (int j = 5; j < 145; ++j) {
+    ////for (int i = 40; i < nlon; ++i) {
+    ////  for (int j = 30; j < nlat; ++j) {
+    ////    for (int k = 1; k < 20; ++k) {
+   // for (int i = 5; i < 145; ++i) {
+      //for (int j = 5; j < 145; ++j) {
+      //  for (int k = 6; k < 19; ++k) {
+    for (int i = 65; i < 85; ++i) {
+      for (int j = 65; j < 85; ++j) {
         for (int k = 6; k < 19; ++k) {
           Observation varOb;
           
@@ -512,16 +515,16 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       varOb.setWeight(0,2,3);
       
       
-+      if ((i==40 and j==40) or (i==60 and j==60) or (i==80 and j==80) or (i==100 and j==100)) {   
-+          varOb.setOb(pip-0.00025);
-+          varOb.setWeight(1,0,0);
-+          varOb.setWeight(1,2,0);
-+          varOb.setError(configHash.value("thermo_D_error").toFloat());
-+          obVector->push_back(varOb);
-+          varOb.setWeight(0,0,0);      
-+          varOb.setWeight(0,2,0);
-+      }    
-+        
+     if ((i==40 and j==40) or (i==60 and j==60) or (i==80 and j==80) or (i==100 and j==100)) {   
+          varOb.setOb(pip-0.00025);
+          varOb.setWeight(1,0,0);
+          varOb.setWeight(1,2,0);
+          varOb.setError(configHash.value("thermo_D_error").toFloat());
+          obVector->push_back(varOb);
+          varOb.setWeight(0,0,0);      
+          varOb.setWeight(0,2,0);
+      }    
+        
       
       
    /*   varOb.setOb(d);
