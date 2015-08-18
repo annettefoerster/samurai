@@ -165,7 +165,6 @@ void CostFunctionThermo::initialize(const QHash<QString, QString>* config, real*
 
 void CostFunctionThermo::initState(const int iteration)
 {
-
 	// Clear the state vector
 	cout << "Initializing state vector..." << endl;
 	for (int n = 0; n < nState; n++) {
@@ -201,9 +200,14 @@ void CostFunctionThermo::initState(const int iteration)
 	
 	// Set up the spline matrices
 	setupSplines();
-
-	// Flag whether or not to print the subgrid information
-	mishFlag = configHash->value("output_mish").toInt();
+	
+    // Flag whether or not to print the subgrid information
+    if ((configHash->value("output_mish") == "true") or
+        (configHash->value("save_mish") == "true")) {
+        mishFlag = 1;
+    } else {
+        mishFlag = 0;
+    }	
 	
 	// Mass continuity weight
   mcWeight = configHash->value("mc_weight").toFloat();
@@ -213,69 +217,82 @@ void CostFunctionThermo::initState(const int iteration)
 		cout << "Initializing background..." << endl;
 		// Set up the background state
 		for (int n = 0; n < nState; n++) {
-			bgState[n] = 0.0;
-			bgStdDev[n] = 0.0;
+            bgState[n] = 0.0;
+            // Initialize the std. dev. to 1 for the initial SC transform
+            bgStdDev[n] = 1.0;
 		}
 		
-		// SB Transform on the original bg fields
-		SBtransform(bgFields, stateB);
-		
-		// SA transform = bg B's -> bg A's
-		SAtransform(stateB, bgState);
-	}
-	
-	// Using a constant bg error variance for now, but this could be variable across the nodes
-	for (int var = 0; var < varDim; var++) {
-		for (int iIndex = 0; iIndex < iDim; iIndex++) {
-			for (int jIndex = 0; jIndex < jDim; jIndex++) {
-				for (int kIndex = 0; kIndex < kDim; kIndex++) {
-					int bIndex = varDim*iDim*jDim*kIndex + varDim*iDim*jIndex +varDim*iIndex + var;
-					bgStdDev[bIndex] = bgError[var];
-				}
-			}
-		}
-	}
-	
-	// Compute and display the variable BG errors and RMS of values
-	for (int var = 0; var < varDim; var++) {
-		real varScale = 0;
-		for (int iIndex = 0; iIndex < iDim; iIndex++) {
-			for (int jIndex = 0; jIndex < jDim; jIndex++) {
-				for (int kIndex = 0; kIndex < kDim; kIndex++) {
-					int bIndex = varDim*iDim*jDim*kIndex + varDim*iDim*jIndex +varDim*iIndex + var;
-					varScale += bgState[bIndex] * bgState[bIndex];
-				}
-			}
-		}
-		varScale = sqrt(varScale/(iDim*jDim*kDim));
-		if (varScale) {
-			real errPct = 100*bgError[var]/varScale;
-			cout << "Variable " << var << " RMS = " << varScale << "\t BG Error = " << bgError[var] 
-			<< " ( " << errPct << " %)" << endl;
-		} else {
-			cout << "Variable " << var << " RMS = " << varScale << "\t BG Error = " << bgError[var] 
-			<< " ( Infinite! %)" << endl;
-		}
-	}
-	
-	// Load the obs locally and weight the nonlinear observation operators by interpolated bg fields
-	//obAdjustments();
-	obsVector= rawObs;
+        if (configHash->value("load_bg_coefficients") == "true") {
+            for (int n = 0; n < nState; n++) {
+                stateA[n] = bgFields[n];
+            }
+        } else {
+            // SB Transform on the original bg fields
+            SBtransform(bgFields, stateB);
 
-	// d = y - HXb
-	calcInnovation();
-	
-	// Output the original background field
-	outputAnalysis("background", bgState);
+            // SA transform = bg B's -> bg A's
+            SAtransform(stateB, stateA);
+        }
 
-	cout << "Beginning analysis...\n";
-		
-	// HTd
-	calcHTranspose(innovation, stateC);
-	
-	SCtranspose(stateC, stateA);
-	
-	// S^T (Inverse SA transform) yield B's, put it in the tempState
-	SAtranspose(stateA, CTHTd);
-				
-}	
+        // FF transform to match background and increment
+        FFtransform(stateA, bgState);
+
+    }
+
+    for (int var = 0; var < varDim; var++) {
+        // Using a constant bg error variance for now, but this could be variable across the nodes
+        for (int iIndex = 0; iIndex < iDim; iIndex++) {
+            for (int jIndex = 0; jIndex < jDim; jIndex++) {
+                for (int kIndex = 0; kIndex < kDim; kIndex++) {
+                    int bIndex = varDim*iDim*jDim*kIndex + varDim*iDim*jIndex +varDim*iIndex + var;
+                    bgStdDev[bIndex] = bgError[var];
+                }
+            }
+        }
+    }
+
+    // Compute and display the variable BG errors and RMS of values
+    for (int var = 0; var < varDim; var++) {
+        real varScale = 0;
+        for (int iIndex = 0; iIndex < iDim; iIndex++) {
+            for (int jIndex = 0; jIndex < jDim; jIndex++) {
+                for (int kIndex = 0; kIndex < kDim; kIndex++) {
+                    int bIndex = varDim*iDim*jDim*kIndex + varDim*iDim*jIndex +varDim*iIndex + var;
+                    varScale += bgState[bIndex] * bgState[bIndex];
+                }
+            }
+        }
+        varScale = sqrt(varScale/(iDim*jDim*kDim));
+        if (varScale) {
+            real errPct = 100*bgError[var]/varScale;
+            cout << "Variable " << var << " RMS = " << varScale << "\t BG Error = " << bgError[var]
+            << " ( " << errPct << " %)" << endl;
+        } else {
+            cout << "Variable " << var << " RMS = " << varScale << "\t BG Error = " << bgError[var]
+            << " ( Infinite! %)" << endl;
+        }
+    }
+
+    // Load the obs locally and weight the nonlinear observation operators by interpolated bg fields
+    obAdjustments();
+
+    // Calculate the H matrix operator
+    calcHmatrix();
+
+    // d = y - HXb
+    calcInnovation();
+
+    // Output the original background field
+    outputAnalysis("background", bgState);
+
+    cout << "Beginning analysis...\n";
+
+    // HTd
+    calcHTranspose(innovation, stateC);
+
+    FFtransform(stateC, stateA);
+    SAtransform(stateA, stateB);
+    SCtransform(stateB, CTHTd);
+
+    //Htransform(stateB);
+}
