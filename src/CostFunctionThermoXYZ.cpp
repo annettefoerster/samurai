@@ -471,7 +471,7 @@ bool CostFunctionThermoXYZ::writeNetCDF(const QString& netcdfFileName)
     real lonReference = configHash->value("ref_lon").toFloat();
     real refX, refY;
 
-    GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM;
+    GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM();
     tm.Forward(lonReference, latReference, lonReference, refX, refY);
     for (int iIndex = 0; iIndex < iDim; iIndex++) {
         real i = (iMin + DI * iIndex)*1000;

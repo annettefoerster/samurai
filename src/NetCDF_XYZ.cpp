@@ -412,12 +412,12 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
 	//double trp = this->getValue(i,j,k,(QString)"trp");
   float g = 9.81;
   
-  if (thetarhobar==-999 or u==-999 or dwdx==-999 or v==-999 or dwdy==-999 or w==-999 or dwdz==-999){
+  if (thetarhobar==-999 or u==-999 or dwdx==-999 or v==-999 or dwdy==-999 or w==-999 or dwdz==-999 or dpipdz==-999){
     return -999;}
 
-  double c = (u*dwdx+v*dwdy+w*dwdz);
+  //double c = (u*dwdx+v*dwdy+w*dwdz);
   //double c = (u*dwdx+v*dwdy+w*dwdz)-g/thetarhobar*trp;    //If pip only
- // double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
+  double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
 
   return c;	
 }
@@ -446,7 +446,7 @@ double NetCDF_XYZ::getDerivative(const int &i,const int &j,const int &k, const Q
 	double derivative;
 	QString derDir;
   // Geographic functions
-  GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM;
+  GeographicLib::TransverseMercatorExact tm = GeographicLib::TransverseMercatorExact::UTM();
   double referenceLon = -90.0;  //arbitrary
   double x1,x2,y1,y2;      
 

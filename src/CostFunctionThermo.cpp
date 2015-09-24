@@ -142,13 +142,15 @@ void CostFunctionThermo::initialize(const QHash<QString, QString>* config, real*
         kGamma[var] = new real[kRank[var]*kDim];
 
     }
+    
 	// Precalculate the basis functions for lookup table option
+	/*
 	basisappx = configHash->value("spline_approximation").toInt();
 	if (basisappx > 0) {
 		basis0 = new real[2000000];
 		basis1 = new real[2000000];
 		fillBasisLookup();
-	}
+	} */
     
     // Initialize the Fourier transforms
     iFFTin = (double*) fftw_malloc(sizeof(double) * iDim);
