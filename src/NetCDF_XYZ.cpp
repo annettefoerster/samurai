@@ -360,7 +360,7 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
   double dpipdx = this->getValue(i,j,k,(QString)"dpipdx");
   float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dudx==-999 or v==-999 or dudy==-999 or w==-999 or dudz==-999 or vtbar==-999 or radius==-999 or vprime==-999){
+  if (thetarhobar==-999 or u==-999 or dudx*1.0E5==-999 or v==-999 or dudy*1.0E5==-999 or w==-999 or dudz*1.0E5==-999 or vtbar==-999 or radius/1000.0==-999 or vprime==-999 or dpibdx*1000.0==-999){
     return -999;}
   
   //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime);
@@ -389,7 +389,7 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
   double dpipdy = this->getValue(i,j,k,(QString)"dpipdy");
   float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dvdx==-999 or v==-999 or dvdy==-999 or w==-999 or dvdz==-999 or vtbar==-999 or radius==-999 or uprime==-999){
+  if (thetarhobar==-999 or u==-999 or dvdx*1.0E5==-999 or v==-999 or dvdy*1.0E5==-999 or w==-999 or dvdz*1.0E5==-999 or vtbar==-999 or radius/1000.0==-999 or uprime==-999 or dpibdy*1000.0==-999){
     return -999;}
     
   //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime);
@@ -412,7 +412,7 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
 	//double trp = this->getValue(i,j,k,(QString)"trp");
   float g = 9.81;
   
-  if (thetarhobar==-999 or u==-999 or dwdx==-999 or v==-999 or dwdy==-999 or w==-999 or dwdz==-999 or dpipdz==-999){
+  if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999 or dpipdz*1000.0==-999){
     return -999;}
 
   //double c = (u*dwdx+v*dwdy+w*dwdz);

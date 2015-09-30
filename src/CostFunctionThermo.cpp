@@ -221,7 +221,7 @@ void CostFunctionThermo::initState(const int iteration)
 		for (int n = 0; n < nState; n++) {
             bgState[n] = 0.0;
             // Initialize the std. dev. to 1 for the initial SC transform
-            bgStdDev[n] = 1.0;
+            bgStdDev[n] = 0.0;
 		}
 		
         if (configHash->value("load_bg_coefficients") == "true") {
