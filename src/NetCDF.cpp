@@ -14,7 +14,7 @@
 #include <iostream>
 #include <QString>
 
-NetCDF::NetCDF() :c_p(1005.7), g(9.81), f(0.448432045656147e-05), pi(3.14159265358979323846)
+NetCDF::NetCDF() :c_p(1005.7), g(9.81), f(5.85e-05), pi(3.14159265358979323846)
  {
 	NDIMS = 4;
 	NALT = 33;

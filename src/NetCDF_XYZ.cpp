@@ -415,9 +415,9 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
   if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999 or dpipdz*1000.0==-999){
     return -999;}
 
-  //double c = (u*dwdx+v*dwdy+w*dwdz);
+  double c = (u*dwdx+v*dwdy+w*dwdz);
   //double c = (u*dwdx+v*dwdy+w*dwdz)-g/thetarhobar*trp;    //If pip only
-  double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
+//  double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
 
   return c;	
 }

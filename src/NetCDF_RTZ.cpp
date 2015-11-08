@@ -13,6 +13,7 @@
 #include "NetCDF_RTZ.h"
 #include <iostream>
 #include <QString>
+#include <cstdlib>
 
 NetCDF_RTZ::NetCDF_RTZ()
 :NetCDF::NetCDF()
@@ -383,7 +384,7 @@ double NetCDF_RTZ::getDerivative(const int &i,const int &j,const int &k, const Q
 	    break; 
 	  default:
 		std::cout << "Unknown value for calculating derivative. Valid options are 0, 1 and 2.\n";
-		exit(1);
+		std::exit(1);
 	}
 	return derivative;
 }
