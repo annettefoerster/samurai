@@ -29,7 +29,7 @@ public:
 	double calc_B(const int &i,const int &j,const int &k);
 	double calc_C(const int &i,const int &j,const int &k);
 	double calc_D(const int &i,const int &j,const int &k);
-  
+        double calc_E(const int &i,const int &j,const int &k);  
   
 protected:
   int NRADIUS, NTHETA;

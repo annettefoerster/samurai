@@ -331,7 +331,13 @@ double NetCDF_XYZ::getValue(const int &i,const int &j,const int &k, const QStrin
 	value_out= dpiprimedz[k*NLAT*NLON + j*NLAT + i]/1000.0;
 	} else if (varName=="trp") {
 	value_out= thetarhoprime[k*NLAT*NLON + j*NLAT + i];	 
-   
+        } else if (varName=="A") {
+        value_out= this->calc_A(i,j,k); 
+        } else if (varName=="B") {
+       	value_out= this->calc_B(i,j,k);
+       	} else if (varName=="C") {
+       	value_out= this->calc_C(i,j,k);
+
 	} else {
 	std::cout << "Requested Variable unknown. \n";
   std::cout << varName.toStdString() << "\n";
@@ -351,22 +357,13 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
 	double dudy = this->getValue(i,j,k,(QString)"dudy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dudz = this->getValue(i,j,k,(QString)"dudz");
-	//double azimuth = this->getValue(i,j,k,(QString)"az");	
-	double vtbar = this->getValue(i,j,k,(QString)"vtb");
-	double radius = this->getValue(i,j,k,(QString)"r");	
-	double vprime = this->getValue(i,j,k,(QString)"vp");  
-   double dpibdx = this->getValue(i,j,k,(QString)"dpibdx");
-  //double trp = this->getValue(i,j,k,(QString)"trp");
-  double dpipdx = this->getValue(i,j,k,(QString)"dpipdx");
-  float c_p = 1005.7;
+        double dpibdx = this->getValue(i,j,k,(QString)"dpibdx");
+        float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dudx*1.0E5==-999 or v==-999 or dudy*1.0E5==-999 or w==-999 or dudz*1.0E5==-999 or vtbar==-999 or radius/1000.0==-999 or vprime==-999 or dpibdx*1000.0==-999){
+  if (thetarhobar==-999 or u==-999 or dudx*1.0E5==-999 or v==-999 or dudy*1.0E5==-999 or w==-999 or dudz*1.0E5==-999 or dpibdx*1000.0==-999){
     return -999;}
   
-  //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime);
-  //double a = (u*dudx+v*dudy+w*dudz+vtbar*vtbar/radius*cos(azimuth)-f*vprime)+c_p*dpibdx*trp;		//If pip only
-  double a = (u*dudx+v*dudy+w*dudz-f*v)+c_p*thetarhobar*dpibdx;   // trp neglected
-  
+        double a = 1.0/(-c_p*thetarhobar)* (u*dudx+v*dudy+w*dudz-f*v)-dpibdx;   
 	return a;	
 }
 
@@ -380,23 +377,14 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
 	double dvdy = this->getValue(i,j,k,(QString)"dvdy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dvdz = this->getValue(i,j,k,(QString)"dvdz");
-	//double azimuth = this->getValue(i,j,k,(QString)"az");	
-	double vtbar = this->getValue(i,j,k,(QString)"vtb");
-	double radius = this->getValue(i,j,k,(QString)"r");	
-	double uprime = this->getValue(i,j,k,(QString)"up"); 
-   double dpibdy = this->getValue(i,j,k,(QString)"dpibdy");
-	//double trp = this->getValue(i,j,k,(QString)"trp");
-  double dpipdy = this->getValue(i,j,k,(QString)"dpipdy");
-  float c_p = 1005.7;
+        double dpibdy = this->getValue(i,j,k,(QString)"dpibdy");
+        float c_p = 1005.7;
 
-  if (thetarhobar==-999 or u==-999 or dvdx*1.0E5==-999 or v==-999 or dvdy*1.0E5==-999 or w==-999 or dvdz*1.0E5==-999 or vtbar==-999 or radius/1000.0==-999 or uprime==-999 or dpibdy*1000.0==-999){
+  if (thetarhobar==-999 or u==-999 or dvdx*1.0E5==-999 or v==-999 or dvdy*1.0E5==-999 or w==-999 or dvdz*1.0E5==-999 or dpibdy*1000.0==-999){
     return -999;}
     
-  //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime);
-  //double b = (u*dvdx+v*dvdy+w*dvdz+vtbar*vtbar/radius*sin(azimuth)+f*uprime)+c_p*dpibdy*trp;   //If pip only
-  double b = (u*dvdx+v*dvdy+w*dvdz+f*u)+c_p*thetarhobar*dpibdy;   // trp neglected
-
-  return b;	
+    double b = 1.0/(-c_p*thetarhobar)*(u*dvdx+v*dvdy+w*dvdz+f*u)-dpibdy;   // trp neglected
+    return b;	
 }
 
 double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
@@ -408,35 +396,46 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
 	double dwdy = this->getValue(i,j,k,(QString)"dwdy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dwdz = this->getValue(i,j,k,(QString)"dwdz");
-  double dpipdz = this->getValue(i,j,k,(QString)"dpipdz");
-	//double trp = this->getValue(i,j,k,(QString)"trp");
-  float g = 9.81;
+        float g = 9.81;
   
-  if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999 or dpipdz*1000.0==-999){
+  if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999){
     return -999;}
 
-  double c = (u*dwdx+v*dwdy+w*dwdz);
-  //double c = (u*dwdx+v*dwdy+w*dwdz)-g/thetarhobar*trp;    //If pip only
-//  double c = (u*dwdx+v*dwdy+w*dwdz)+c_p*thetarhobar*dpipdz;  //If trp only
-
-  return c;	
+    double c = 1.0/(-c_p*thetarhobar)*(u*dwdx+v*dwdy+w*dwdz);
+    return c;	
 }
 
 double NetCDF_XYZ::calc_D(const int &i,const int &j,const int &k)
 {
-  double u = this->getValue(i,j,k,(QString)"u");
-  double dtrbdx = this->getDerivative(i,j,k,(QString)"trb",1);
-  double v = this->getValue(i,j,k,(QString)"v");
-  double dtrbdy = this->getDerivative(i,j,k,(QString)"trb",2);
-  double w = this->getValue(i,j,k,(QString)"w");
-  double dtrbdz = this->getDerivative(i,j,k,(QString)"trb",3);
 
- if (u==-999 or dtrbdx==-999 or v==-999 or dtrbdy==-999 or w==-999 or dtrbdz==-999){
+  double thetarhobar = this->getValue(i,j,k,(QString)"trb");
+  double dAdz = this->getDerivative(i,j,k,(QString)"A",3);
+  double dCdx = this->getDerivative(i,j,k,(QString)"trb",1);
+  float c_p = 1005.7;
+  float g = 9.81;  
+
+ if (thetarhobar==-999 or dAdz==-999 or dCdx==-999){
     return -999;}
 
-  double d = u*dtrbdx+v*dtrbdy+w*dtrbdz;
+  double d = (dAdz-dCdx)*thetarhobar*thetarhobar*(-c_p/g);
 
 	return d;	
+}
+
+double NetCDF_XYZ::calc_E(const int &i,const int &j,const int &k)
+{
+  double thetarhobar = this->getValue(i,j,k,(QString)"trb");
+  double dBdz = this->getDerivative(i,j,k,(QString)"B",3);
+  double dCdy = this->getDerivative(i,j,k,(QString)"trb",2);
+  float	c_p = 1005.7;
+  float	g = 9.81;
+  
+ if (thetarhobar==-999 or dBdz==-999 or dCdy==-999){
+    return -999;}
+
+  double e = (dBdz-dCdy)*thetarhobar*thetarhobar*(-c_p/g);
+
+        return e;
 }
 
 

@@ -28,7 +28,7 @@ public:
 	virtual double calc_B(const int &i,const int &j,const int &k)=0;
 	virtual double calc_C(const int &i,const int &j,const int &k)=0;
 	virtual double calc_D(const int &i,const int &j,const int &k)=0;
-
+        virtual double calc_E(const int &i,const int &j,const int &k)=0;
 	
 
 protected:

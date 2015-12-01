@@ -458,19 +458,16 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
           }
       }
       
-      double a,b,c,d;                    
+      double a,b,c,d,e;                    
                           
       a = ncFile->calc_A(i,j,k);
       b = ncFile->calc_B(i,j,k);
       c = ncFile->calc_C(i,j,k);
       d = ncFile->calc_D(i,j,k);
+      e = ncFile->calc_E(i,j,k);
 
-      double thetarhoprime = ncFile->getValue(i,j,k,(QString)"trp");  
       double thetarhobar = ncFile->getValue(i,j,k,(QString)"trb");
-      double dpibardx    = ncFile->getValue(i,j,k,(QString)"dpibdx");
-      double dpibardy    = ncFile->getValue(i,j,k,(QString)"dpibdy");
       
-      double pip = ncFile->getValue(i,j,k,(QString)"pip");      
       
       double u = ncFile->getValue(i,j,k,(QString)"u");
       double v = ncFile->getValue(i,j,k,(QString)"v");
@@ -478,75 +475,46 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       double wspd = u*u+v*v;
 
       
-      if (wspd < 25 or  a==-999 or b==-999 or c==-999 or d==-999 or thetarhobar==-999 or thetarhoprime==-999 or dpibardx*1000==-999 or dpibardy*1000==-999){
+      if (a==-999 or b==-999 or c==-999 or d==-999 or e==-999 or thetarhobar==-999){
         continue;}
       
-      if (a==-999 or b==-999 or c==-999 or d==-999 or thetarhobar==-999 or thetarhoprime==-999 or dpibardx*1000==-999 or dpibardy*1000==-999){
+      if (a==-999 or b==-999 or c==-999 or d==-999 or e==-999 or thetarhobar==-999){
         std::cout << "Skip this ... \n";}
 
       float c_p = 1005.7;
       float g = 9.81;		
       
       varOb.setOb(a);
-      varOb.setWeight(-c_p*thetarhobar*0.001,0,1);	
-      //varOb.setWeight(-c_p*dpibardx,1,0);		
+      varOb.setWeight(0.001,0,1);	
       varOb.setError(configHash.value("thermo_A_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,1);
-      //varOb.setWeight(0,1,0);
       
       varOb.setOb(b);
-      varOb.setWeight(-c_p*thetarhobar*0.001,0,2);	
-      //varOb.setWeight(-c_p*dpibardy,1,0);		
+      varOb.setWeight(0.001,0,2);	
       varOb.setError(configHash.value("thermo_B_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,2);
-      //varOb.setWeight(0,1,0);
       
-/*      varOb.setOb(c);
-      varOb.setWeight(-c_p*thetarhobar*0.001,0,3);
-      varOb.setWeight(g/thetarhobar,1,0);
-      ////varOb.setWeight(-c_p*thetarhobar,2,3);
-      varOb.setError(configHash.value("thermo_C_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,0,3);	
-      varOb.setWeight(0,1,0);
-//      //// varOb.setWeight(0,2,3);
-      
-      
-     if ((i==45 and j==45) or (i==45 and j==105) or (i==105 and j==45) or (i==105 and j==105)) {   
-          varOb.setOb(pip);
-          varOb.setWeight(1,0,0);
-          //varOb.setWeight(1,2,0);
-          varOb.setError(configHash.value("thermo_D_error").toFloat());
-          obVector->push_back(varOb);
-          varOb.setWeight(0,0,0);      
-          //varOb.setWeight(0,2,0);
-
-          varOb.setOb(thetarhoprime);
-          varOb.setWeight(1,1,0);
-          //varOb.setWeight(1,2,0);
-          varOb.setError(configHash.value("thermo_D_error").toFloat());
-          obVector->push_back(varOb);
-          varOb.setWeight(0,1,0);      
-          //varOb.setWeight(0,2,0);
-
-      }    
-        
-*/      
-      
-//      varOb.setOb(d);
-//      varOb.setWeight(-u,1,1);
-//      varOb.setWeight(-v,1,2);
-//      varOb.setWeight(-w,1,3);
-//      varOb.setWeight(1,2,0);
-//      varOb.setError(configHash.value("thermo_D_error").toFloat());
+//      varOb.setOb(c);
+//      varOb.setWeight(0.001,0,3);
+//      varOb.setWeight(-g/(c_p*thetarhobar*thetarhobar),1,0);
+//      varOb.setError(configHash.value("thermo_C_error").toFloat());
 //      obVector->push_back(varOb);
-//      varOb.setWeight(0,1,1);	
-//      varOb.setWeight(0,1,2);
-//      varOb.setWeight(0,1,3);
-//      varOb.setWeight(0,2,0);
-      
+//      varOb.setWeight(0,0,3);	
+//      varOb.setWeight(0,1,0);
+
+      varOb.setOb(d);
+      varOb.setWeight(1,1,1);
+      varOb.setError(configHash.value("thermo_D_error").toFloat());
+      obVector->push_back(varOb);
+      varOb.setWeight(0,1,1);
+
+      varOb.setOb(e);
+      varOb.setWeight(1,1,2);
+      varOb.setError(configHash.value("thermo_E_error").toFloat());
+      obVector->push_back(varOb);
+      varOb.setWeight(0,1,2);
       
         }
       }

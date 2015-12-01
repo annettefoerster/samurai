@@ -345,6 +345,11 @@ double NetCDF_RTZ::calc_D(const int &i,const int &j,const int &k)
 }
 
 
+double NetCDF_RTZ::calc_E(const int &i,const int &j,const int &k)
+{
+      return -999;
+}
+
 double NetCDF_RTZ::getDerivative(const int &i,const int &j,const int &k, const QString &var, const int &der)
 {
 	// input variable "der" specifies direction of derivation: 1=dr, 2=dlambda, 3=dz
