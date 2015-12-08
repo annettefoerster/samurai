@@ -484,37 +484,37 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       float c_p = 1005.7;
       float g = 9.81;		
       
-      varOb.setOb(a);
-      varOb.setWeight(0.001,0,1);	
+      varOb.setOb(a*1E7);
+     varOb.setWeight(-0.001*1E7,0,1);	
       varOb.setError(configHash.value("thermo_A_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,1);
       
-      varOb.setOb(b);
-      varOb.setWeight(0.001,0,2);	
+      varOb.setOb(b*1E7);
+      varOb.setWeight(-0.001*1E7,0,2);	
       varOb.setError(configHash.value("thermo_B_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,2);
       
 //      varOb.setOb(c);
-//      varOb.setWeight(0.001,0,3);
-//      varOb.setWeight(-g/(c_p*thetarhobar*thetarhobar),1,0);
+//      varOb.setWeight(-0.001,0,3);
+//      varOb.setWeight(g/(c_p*thetarhobar*thetarhobar),1,0);
 //      varOb.setError(configHash.value("thermo_C_error").toFloat());
 //      obVector->push_back(varOb);
 //      varOb.setWeight(0,0,3);	
 //      varOb.setWeight(0,1,0);
 
-      varOb.setOb(d);
-      varOb.setWeight(1,1,1);
-      varOb.setError(configHash.value("thermo_D_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,1);
+        varOb.setOb(d);
+        varOb.setWeight(1,1,1);
+        varOb.setError(configHash.value("thermo_D_error").toFloat());
+        obVector->push_back(varOb);
+        varOb.setWeight(0,1,1);
 
-      varOb.setOb(e);
-      varOb.setWeight(1,1,2);
-      varOb.setError(configHash.value("thermo_E_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,2);
+        varOb.setOb(e);
+        varOb.setWeight(1,1,2);
+        varOb.setError(configHash.value("thermo_E_error").toFloat());
+        obVector->push_back(varOb);
+        varOb.setWeight(0,1,2);
       
         }
       }

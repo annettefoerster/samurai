@@ -363,7 +363,7 @@ double NetCDF_XYZ::calc_A(const int &i,const int &j,const int &k)
   if (thetarhobar==-999 or u==-999 or dudx*1.0E5==-999 or v==-999 or dudy*1.0E5==-999 or w==-999 or dudz*1.0E5==-999 or dpibdx*1000.0==-999){
     return -999;}
   
-        double a = 1.0/(-c_p*thetarhobar)* (u*dudx+v*dudy+w*dudz-f*v)-dpibdx;   
+        double a = 1.0/(c_p*thetarhobar)* (u*dudx+v*dudy+w*dudz-f*v)+dpibdx;   
 	return a;	
 }
 
@@ -383,7 +383,7 @@ double NetCDF_XYZ::calc_B(const int &i,const int &j,const int &k)
   if (thetarhobar==-999 or u==-999 or dvdx*1.0E5==-999 or v==-999 or dvdy*1.0E5==-999 or w==-999 or dvdz*1.0E5==-999 or dpibdy*1000.0==-999){
     return -999;}
     
-    double b = 1.0/(-c_p*thetarhobar)*(u*dvdx+v*dvdy+w*dvdz+f*u)-dpibdy;   // trp neglected
+    double b = 1.0/(c_p*thetarhobar)*(u*dvdx+v*dvdy+w*dvdz+f*u)+dpibdy;   // trp neglected
     return b;	
 }
 
@@ -401,7 +401,7 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
   if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999){
     return -999;}
 
-    double c = 1.0/(-c_p*thetarhobar)*(u*dwdx+v*dwdy+w*dwdz);
+    double c = 1.0/(c_p*thetarhobar)*(u*dwdx+v*dwdy+w*dwdz);
     return c;	
 }
 
@@ -409,8 +409,8 @@ double NetCDF_XYZ::calc_D(const int &i,const int &j,const int &k)
 {
 
   double thetarhobar = this->getValue(i,j,k,(QString)"trb");
-  double dAdz = this->getDerivative(i,j,k,(QString)"A",3);
-  double dCdx = this->getDerivative(i,j,k,(QString)"trb",1);
+  double dAdz = this->getDerivative(i,j,k,(QString)"A",3)*1000.0;   // per km
+  double dCdx = this->getDerivative(i,j,k,(QString)"C",1)*1000.0;   // per km
   float c_p = 1005.7;
   float g = 9.81;  
 
@@ -425,8 +425,8 @@ double NetCDF_XYZ::calc_D(const int &i,const int &j,const int &k)
 double NetCDF_XYZ::calc_E(const int &i,const int &j,const int &k)
 {
   double thetarhobar = this->getValue(i,j,k,(QString)"trb");
-  double dBdz = this->getDerivative(i,j,k,(QString)"B",3);
-  double dCdy = this->getDerivative(i,j,k,(QString)"trb",2);
+  double dBdz = this->getDerivative(i,j,k,(QString)"B",3)*1000.0;  // per km
+  double dCdy = this->getDerivative(i,j,k,(QString)"C",2)*1000.0;  // per km
   float	c_p = 1005.7;
   float	g = 9.81;
   
