@@ -35,6 +35,7 @@ public:
 	virtual bool initialize(const QDomElement& configuration) = 0;
 	virtual bool run() = 0;
 	virtual bool finalize() = 0;
+        virtual bool validateXMLconfig() = 0;
 
 protected:
 

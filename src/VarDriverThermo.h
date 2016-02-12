@@ -42,6 +42,7 @@ public:
 	bool initialize(const QDomElement& configuration);
 	bool run();
 	bool finalize();
+        bool validateXMLconfig();
   bool testing(QList<Observation>* obVector);
   bool testing_rtz(QList<Observation>* obVector);
   

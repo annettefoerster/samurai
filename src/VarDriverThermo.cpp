@@ -420,9 +420,10 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
     ////for (int i = 40; i < nlon; ++i) {
     ////  for (int j = 30; j < nlat; ++j) {
     ////    for (int k = 1; k < 20; ++k) {
-    for (int i = 5; i < 145; ++i) {
-      for (int j = 5; j < 145; ++j) {
-        for (int k = 6; k < 19; ++k) {
+   
+    for (int i = 5; i < 146; ++i) {         // 0,151
+      for (int j = 5; j < 146; ++j) {
+        for (int k = 5; k < 26; ++k) {     //0,31
           Observation varOb;
           
       double lon = ncFile->getValue(i,j,k,(QString)"lon");
@@ -484,39 +485,39 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       float c_p = 1005.7;
       float g = 9.81;		
       
-      varOb.setOb(a*1E7);
-     varOb.setWeight(-0.001*1E7,0,1);	
+      varOb.setOb(a*1E8);
+      varOb.setWeight(-0.001*1E8,0,1);	
       varOb.setError(configHash.value("thermo_A_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,1);
       
-      varOb.setOb(b*1E7);
-      varOb.setWeight(-0.001*1E7,0,2);	
+      varOb.setOb(b*1E8);
+      varOb.setWeight(-0.001*1E8,0,2);	
       varOb.setError(configHash.value("thermo_B_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,2);
       
-//      varOb.setOb(c);
-//      varOb.setWeight(-0.001,0,3);
-//      varOb.setWeight(g/(c_p*thetarhobar*thetarhobar),1,0);
+//      varOb.setOb(c*1E8);
+//      varOb.setWeight(-0.001*1E8,0,3);
+//      varOb.setWeight(g*1E8/(c_p*thetarhobar*thetarhobar),1,0);
 //      varOb.setError(configHash.value("thermo_C_error").toFloat());
 //      obVector->push_back(varOb);
 //      varOb.setWeight(0,0,3);	
 //      varOb.setWeight(0,1,0);
 
-        varOb.setOb(d);
-        varOb.setWeight(1,1,1);
+        varOb.setOb(d*1.0E5);
+        varOb.setWeight(1.0E5,1,1);
         varOb.setError(configHash.value("thermo_D_error").toFloat());
         obVector->push_back(varOb);
         varOb.setWeight(0,1,1);
 
-        varOb.setOb(e);
-        varOb.setWeight(1,1,2);
+        varOb.setOb(e*1.0E5);
+        varOb.setWeight(1.0E5,1,2);
         varOb.setError(configHash.value("thermo_E_error").toFloat());
         obVector->push_back(varOb);
         varOb.setWeight(0,1,2);
       
-        }
+       }
       }
     }      
     
@@ -529,6 +530,25 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
   
 }
 
+bool VarDriverThermo::validateXMLconfig()
+{
+
+    // Validate the hash -- multiple passes are not validated currently
+    QStringList configKeys;
+    configKeys << "i_min" << "i_max" << "i_incr" <<
+    "j_min" << "j_max" << "j_incr" <<
+    "k_min" << "k_max" << "k_incr" <<
+    "i_pip_bcL" << "i_pip_bcR" << "j_pip_bcL" << "j_pip_bcR" << "k_pip_bcL" << "k_pip_bcR" <<
+    "i_thetarhop_bcL" << "i_thetarhop_bcR" << "j_thetarhop_bcL" << "j_thetarhop_bcR" << "k_thetarhop_bcL" << "k_thetarhop_bcR" <<
+	"data_directory" << "output_directory";
+    for (int i = 0; i < configKeys.count(); i++) {
+        if (!configHash.contains(configKeys.at(i))) {
+            cout <<	"No configuration found for <" << configKeys.at(i).toStdString() << "> aborting..." << endl;
+            return false;
+        }
+    }
+    return true;
+}
 
 bool VarDriverThermo::testing(QList<Observation>* obVector)
 {

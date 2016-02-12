@@ -396,6 +396,7 @@ double NetCDF_XYZ::calc_C(const int &i,const int &j,const int &k)
 	double dwdy = this->getValue(i,j,k,(QString)"dwdy");
 	double w = this->getValue(i,j,k,(QString)"w");	
 	double dwdz = this->getValue(i,j,k,(QString)"dwdz");
+        float c_p = 1005.7;
         float g = 9.81;
   
   if (thetarhobar==-999 or u==-999 or dwdx*1.0E5==-999 or v==-999 or dwdy*1.0E5==-999 or w==-999 or dwdz*1.0E5==-999){
@@ -449,59 +450,95 @@ double NetCDF_XYZ::getDerivative(const int &i,const int &j,const int &k, const Q
   double referenceLon = -90.0;  //arbitrary
   double x1,x2,y1,y2;      
 
-	switch ( der ) {
-	  case 1:
-	    derDir = "X";  
-	    if (i==0){
+        switch ( der ) {
+          case 1:
+            derDir = "X";
+            if (i==0){
         //need to convert lat/lon differences to kms
         tm.Forward(referenceLon,this->getValue(i+1,j,k,"lat"),this->getValue(i+1,j,k,"lon"),x1,y1);
         tm.Forward(referenceLon,this->getValue(i,j,k,"lat"),this->getValue(i,j,k,"lon"),x2,y2);
         double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-	      derivative = (this->getValue(i+1,j,k,var)-this->getValue(i,j,k,var))/distance;
-	    } else if (i== NLON-1) {
+              if (this->getValue(i+1,j,k,var)==-999 || this->getValue(i,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+                 derivative = (this->getValue(i+1,j,k,var)-this->getValue(i,j,k,var))/distance;
+              }
+            } else if (i== NLON-1) {
         tm.Forward(referenceLon,this->getValue(i,j,k,"lat"),this->getValue(i,j,k,"lon"),x1,y1);
         tm.Forward(referenceLon,this->getValue(i-1,j,k,"lat"),this->getValue(i-1,j,k,"lon"),x2,y2);
         double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-	      derivative = (this->getValue(i,j,k,var)-this->getValue(i-1,j,k,var))/distance;	    
-	    } else {
+              if (this->getValue(i,j,k,var)==-999 || this->getValue(i-1,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+              derivative = (this->getValue(i,j,k,var)-this->getValue(i-1,j,k,var))/distance;
+              }
+            } else {
         tm.Forward(referenceLon,this->getValue(i+1,j,k,"lat"),this->getValue(i+1,j,k,"lon"),x1,y1);
         tm.Forward(referenceLon,this->getValue(i-1,j,k,"lat"),this->getValue(i-1,j,k,"lon"),x2,y2);
         double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-	      derivative = (this->getValue(i+1,j,k,var)-this->getValue(i-1,j,k,var))/distance;	    
-	    }
-	    break;
-	  case 2:
-	    derDir = "Y";
-	    if (j==0){
+              if (this->getValue(i+1,j,k,var)==-999 || this->getValue(i-1,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+                 derivative = (this->getValue(i+1,j,k,var)-this->getValue(i-1,j,k,var))/distance;
+              }
+            }
+            break;
+          case 2:
+             derDir = "Y";
+            if (j==0){
         tm.Forward(referenceLon,this->getValue(i,j+1,k,"lat"),this->getValue(i,j+1,k,"lon"),x1,y1);
         tm.Forward(referenceLon,this->getValue(i,j,k,"lat"),this->getValue(i,j,k,"lon"),x2,y2);
-        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));       
-	      derivative = (this->getValue(i,j+1,k,var)-this->getValue(i,j,k,var))/distance;
-	    } else if (j== NLAT-1) {
+        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+              if (this->getValue(i,j+1,k,var)==-999 || this->getValue(i,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+                 derivative = (this->getValue(i,j+1,k,var)-this->getValue(i,j,k,var))/distance;
+              }
+            } else if (j== NLAT-1) {
         tm.Forward(referenceLon,this->getValue(i,j,k,"lat"),this->getValue(i,j,k,"lon"),x1,y1);
         tm.Forward(referenceLon,this->getValue(i,j-1,k,"lat"),this->getValue(i,j-1,k,"lon"),x2,y2);
-        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)); 
-	      derivative = (this->getValue(i,j,k,var)-this->getValue(i,j-1,k,var))/distance;	    
-	    } else {
+        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+              if (this->getValue(i,j,k,var)==-999 || this->getValue(i,j-1,k,var)==-999){
+                 derivative = -999;
+              } else {
+              derivative = (this->getValue(i,j,k,var)-this->getValue(i,j-1,k,var))/distance;
+              }
+            } else {
         tm.Forward(referenceLon,this->getValue(i,j+1,k,"lat"),this->getValue(i,j+1,k,"lon"),x2,y2);
         tm.Forward(referenceLon,this->getValue(i,j-1,k,"lat"),this->getValue(i,j-1,k,"lon"),x2,y2);
-        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)); 
-	      derivative = (this->getValue(i,j+1,k,var)-this->getValue(i,j-1,k,var))/distance;	    
-	    }
-	    break;
-	  case 3:
-	  	derDir = "Z";
-	    if (k==0){
-	      derivative = (this->getValue(i,j,k+1,var)-this->getValue(i,j,k,var))/(this->getValue(i,j,k+1,"z")-this->getValue(i,j,k,"z"));
-	    } else if (k== NALT-1) {
-	      derivative = (this->getValue(i,j,k,var)-this->getValue(i,j,k-1,var))/(this->getValue(i,j,k,"z")-this->getValue(i,j,k-1,"z"));	    
-	    } else {
-	      derivative = (this->getValue(i,j,k+1,var)-this->getValue(i,j,k-1,var))/(this->getValue(i,j,k+1,"z")-this->getValue(i,j,k-1,"z"));	    
-	    }	  	   
-	    break; 
-	  default:
-		std::cout << "Unknown value for calculating derivative. Valid options are 1, 2 and 3.\n";
-		exit(1);
-	}
+        double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+              if (this->getValue(i,j+1,k,var)==-999 || this->getValue(i,j-1,k,var)==-999){
+                 derivative = -999;
+              } else {
+              derivative = (this->getValue(i,j+1,k,var)-this->getValue(i,j-1,k,var))/distance;
+              }
+            }
+            break;
+          case 3:
+                derDir = "Z";
+            if (k==0){
+              if (this->getValue(i,j,k+1,var)==-999 || this->getValue(i,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+                derivative = (this->getValue(i,j,k+1,var)-this->getValue(i,j,k,var))/(this->getValue(i,j,k+1,"z")-this->getValue(i,j,k,"z"));
+              }
+            } else if (k== NALT-1) {
+              if (this->getValue(i+1,j,k,var)==-999 || this->getValue(i,j,k,var)==-999){
+                 derivative = -999;
+              } else {
+                 derivative = (this->getValue(i,j,k,var)-this->getValue(i,j,k-1,var))/(this->getValue(i,j,k,"z")-this->getValue(i,j,k-1,"z"));
+              }   
+            } else {
+              if (this->getValue(i,j,k+1,var)==-999 || this->getValue(i,j,k-1,var)==-999){
+                 derivative = -999;
+              } else {
+                 derivative = (this->getValue(i,j,k+1,var)-this->getValue(i,j,k-1,var))/(this->getValue(i,j,k+1,"z")-this->getValue(i,j,k-1,"z"));
+              }
+            }
+            break;
+          default:
+                std::cout << "Unknown value for calculating derivative. Valid options are 1, 2 and 3.\n";
+                exit(1);
+        }
 	return derivative;
 }

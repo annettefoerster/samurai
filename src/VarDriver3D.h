@@ -38,6 +38,7 @@ public:
 	virtual bool initialize(const QDomElement& configuration);
 	virtual bool run();
 	virtual bool finalize();
+        virtual bool validateXMLconfig();
 	
 protected:
 	typedef BSplineBase<real> SplineBase;
@@ -51,7 +52,6 @@ protected:
 	int loadBackgroundCoeffs();
 	bool adjustBackground(const int& bStateSize);
 	void updateAnalysisParams(const int& iteration);
-	bool validateXMLconfig();
 
 	QList<real> bgIn;
 	QList<Observation> obVector;

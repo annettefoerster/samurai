@@ -40,25 +40,25 @@ void CostFunctionThermo::initialize(const QHash<QString, QString>* config, real*
 	
 	// Horizontal boundary conditions
 	iBCL[0] = bcHash.value(configHash->value("i_pip_bcL"));
-    iBCR[0] = bcHash.value(configHash->value("i_pip_bcR"));
+        iBCR[0] = bcHash.value(configHash->value("i_pip_bcR"));
 	iBCL[1] = bcHash.value(configHash->value("i_thetarhop_bcL"));
-    iBCR[1] = bcHash.value(configHash->value("i_thetarhop_bcR"));
+        iBCR[1] = bcHash.value(configHash->value("i_thetarhop_bcR"));
 	iBCL[2] = bcHash.value(configHash->value("i_ftheta_bcL"));
-    iBCR[2] = bcHash.value(configHash->value("i_ftheta_bcR"));
+        iBCR[2] = bcHash.value(configHash->value("i_ftheta_bcR"));
 
 	jBCL[0] = bcHash.value(configHash->value("j_pip_bcL"));
-    jBCR[0] = bcHash.value(configHash->value("j_pip_bcR"));
+        jBCR[0] = bcHash.value(configHash->value("j_pip_bcR"));
 	jBCL[1] = bcHash.value(configHash->value("j_thetarhop_bcL"));
-    jBCR[1] = bcHash.value(configHash->value("j_thetarhop_bcR"));
+        jBCR[1] = bcHash.value(configHash->value("j_thetarhop_bcR"));
 	jBCL[2] = bcHash.value(configHash->value("j_ftheta_bcL"));
-    jBCR[2] = bcHash.value(configHash->value("j_ftheta_bcR"));
+        jBCR[2] = bcHash.value(configHash->value("j_ftheta_bcR"));
 
 	kBCL[0] = bcHash.value(configHash->value("k_pip_bcL"));
-    kBCR[0] = bcHash.value(configHash->value("k_pip_bcR"));
+        kBCR[0] = bcHash.value(configHash->value("k_pip_bcR"));
 	kBCL[1] = bcHash.value(configHash->value("k_thetarhop_bcL"));
-    kBCR[1] = bcHash.value(configHash->value("k_thetarhop_bcR"));
+        kBCR[1] = bcHash.value(configHash->value("k_thetarhop_bcR"));
 	kBCL[2] = bcHash.value(configHash->value("k_ftheta_bcL"));
-    kBCR[2] = bcHash.value(configHash->value("k_ftheta_bcR"));
+        kBCR[2] = bcHash.value(configHash->value("k_ftheta_bcR"));
 
 	// Define the Reference state
     refstate = ref;
@@ -190,7 +190,7 @@ void CostFunctionThermo::initState(const int iteration)
 	bgError[4] = 0;
 	bgError[5] = 0;
 	bgError[6] = 0;
-	
+
 	// Initialize filter scales
 	// Set up the recursive filter
 	iFilterScale = configHash->value("i_filter_length").toFloat();
@@ -221,7 +221,7 @@ void CostFunctionThermo::initState(const int iteration)
 		for (int n = 0; n < nState; n++) {
             bgState[n] = 0.0;
             // Initialize the std. dev. to 1 for the initial SC transform
-            bgStdDev[n] = 0.0;
+            bgStdDev[n] = 1.0;
 		}
 		
         if (configHash->value("load_bg_coefficients") == "true") {
