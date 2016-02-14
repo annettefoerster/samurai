@@ -14,7 +14,7 @@
   <operation>
     <mode>XYZ</mode>
     <data_directory>vardata_0920_1800</data_directory>
-    <output_directory>output_0920_18/test37</output_directory>
+    <output_directory>output_0920_18/test47</output_directory>
     <load_background>false</load_background>
     <adjust_background>false</adjust_background>
     <preprocess_obs>true</preprocess_obs>
@@ -59,11 +59,11 @@
   </options>
   <thermo>
     <infile>20050920_paramBL_18.nc</infile>
-    <thermo_D_error>1.0</thermo_D_error>
-    <thermo_E_error>1.0</thermo_E_error>
-    <thermo_C_error>1.0</thermo_C_error>
-    <thermo_A_error>1.0</thermo_A_error>
-    <thermo_B_error>1.0</thermo_B_error>
+    <thermo_A_error>0.00001</thermo_A_error>
+    <thermo_B_error>0.00001</thermo_B_error>
+    <thermo_C_error>0.00001</thermo_C_error>
+    <thermo_D_error>0.00001</thermo_D_error>
+    <thermo_E_error>0.00001</thermo_E_error>
     <bg_pip_error>1.0</bg_pip_error>
     <bg_thetarhop_error>1.0</bg_thetarhop_error>
     <bg_ftheta_error>1.0</bg_ftheta_error>

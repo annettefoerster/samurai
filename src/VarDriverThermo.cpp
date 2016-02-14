@@ -421,9 +421,9 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
     ////  for (int j = 30; j < nlat; ++j) {
     ////    for (int k = 1; k < 20; ++k) {
    
-    for (int i = 5; i < 146; ++i) {         // 0,151
-      for (int j = 5; j < 146; ++j) {
-        for (int k = 5; k < 26; ++k) {     //0,31
+    for (int i = 0; i < 151; ++i) {         // 0,151
+      for (int j = 0; j < 151; ++j) {
+        for (int k = 0; k < 31; ++k) {     //0,31
           Observation varOb;
           
       double lon = ncFile->getValue(i,j,k,(QString)"lon");
@@ -485,34 +485,34 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       float c_p = 1005.7;
       float g = 9.81;		
       
-      varOb.setOb(a*1E8);
-      varOb.setWeight(-0.001*1E8,0,1);	
+      varOb.setOb(a*1E3*1E3);
+      varOb.setWeight(-0.001*1E3,0,1);	
       varOb.setError(configHash.value("thermo_A_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,1);
       
-      varOb.setOb(b*1E8);
-      varOb.setWeight(-0.001*1E8,0,2);	
+      varOb.setOb(b*1E3*1E3);
+      varOb.setWeight(-0.001*1E3,0,2);	
       varOb.setError(configHash.value("thermo_B_error").toFloat());
       obVector->push_back(varOb);
       varOb.setWeight(0,0,2);
       
-//      varOb.setOb(c*1E8);
-//      varOb.setWeight(-0.001*1E8,0,3);
-//      varOb.setWeight(g*1E8/(c_p*thetarhobar*thetarhobar),1,0);
-//      varOb.setError(configHash.value("thermo_C_error").toFloat());
-//      obVector->push_back(varOb);
-//      varOb.setWeight(0,0,3);	
-//      varOb.setWeight(0,1,0);
+      varOb.setOb(c*1E3*1E3);
+      varOb.setWeight(-0.001*1E3,0,3);
+      varOb.setWeight(g*1E3*1E3/(c_p*thetarhobar*thetarhobar),1,0);
+      varOb.setError(configHash.value("thermo_C_error").toFloat());
+      obVector->push_back(varOb);
+      varOb.setWeight(0,0,3);	
+      varOb.setWeight(0,1,0);
 
-        varOb.setOb(d*1.0E5);
-        varOb.setWeight(1.0E5,1,1);
+        varOb.setOb(d);
+        varOb.setWeight(1,1,1);
         varOb.setError(configHash.value("thermo_D_error").toFloat());
         obVector->push_back(varOb);
         varOb.setWeight(0,1,1);
 
-        varOb.setOb(e*1.0E5);
-        varOb.setWeight(1.0E5,1,2);
+        varOb.setOb(e);
+        varOb.setWeight(1,1,2);
         varOb.setError(configHash.value("thermo_E_error").toFloat());
         obVector->push_back(varOb);
         varOb.setWeight(0,1,2);
