@@ -3,13 +3,13 @@
   <grid>
     <i_min>-75.</i_min>
     <i_max>75.</i_max>
-    <i_incr>5.0</i_incr>
+    <i_incr>1.0</i_incr>
     <j_min>-75.</j_min>
     <j_max>75.</j_max>
-    <j_incr>5.0</j_incr>
+    <j_incr>1.0</j_incr>
     <k_min>0.0</k_min>
     <k_max>15.0</k_max>
-    <k_incr>1.0</k_incr>
+    <k_incr>0.5</k_incr>
   </grid>
   <operation>
     <mode>XYZ</mode>
@@ -37,11 +37,11 @@
     <mask_reflectivity>None</mask_reflectivity>
   </radar>
   <parameters iter="1">
-    <i_filter_length>2.0</i_filter_length>
-    <j_filter_length>2.0</j_filter_length>
+    <i_filter_length>4.0</i_filter_length>
+    <j_filter_length>4.0</j_filter_length>
     <k_filter_length>2.0</k_filter_length>
-    <i_spline_cutoff>2.0</i_spline_cutoff>
-    <j_spline_cutoff>2.0</j_spline_cutoff>
+    <i_spline_cutoff>10.0</i_spline_cutoff>
+    <j_spline_cutoff>10.0</j_spline_cutoff>
     <k_spline_cutoff>2.0</k_spline_cutoff>
     <i_max_wavenumber_rhou>-1.0</i_max_wavenumber_rhou>
     <j_max_wavenumber_rhou>-1.0</j_max_wavenumber_rhou>
@@ -59,14 +59,17 @@
   </options>
   <thermo>
     <infile>20050920_paramBL_18.nc</infile>
-    <thermo_A_error>0.00001</thermo_A_error>
-    <thermo_B_error>0.00001</thermo_B_error>
-    <thermo_C_error>0.00001</thermo_C_error>
-    <thermo_D_error>0.00001</thermo_D_error>
-    <thermo_E_error>0.00001</thermo_E_error>
-    <bg_pip_error>1.0</bg_pip_error>
-    <bg_thetarhop_error>1.0</bg_thetarhop_error>
-    <bg_ftheta_error>1.0</bg_ftheta_error>
+    <infile_idim>121</infile_idim>
+    <infile_jdim>121</infile_jdim>
+    <infile_kdim>37</infile_kdim> 
+    <thermo_A_error>0.01</thermo_A_error>
+    <thermo_B_error>0.01</thermo_B_error>
+    <thermo_C_error>0.01</thermo_C_error>
+    <thermo_D_error>0.01</thermo_D_error>
+    <thermo_E_error>0.01</thermo_E_error>
+    <bg_pip_error>10.0</bg_pip_error>
+    <bg_thetarhop_error>10.0</bg_thetarhop_error>
+    <bg_ftheta_error>10.0</bg_ftheta_error>
     <i_pip_bcL>R0</i_pip_bcL>
     <i_pip_bcR>R0</i_pip_bcR>
     <i_thetarhop_bcL>R0</i_thetarhop_bcL>

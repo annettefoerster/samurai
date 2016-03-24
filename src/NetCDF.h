@@ -18,7 +18,7 @@ class NetCDF
 {
 
 public:
-	NetCDF();
+        NetCDF(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim);
 	virtual ~NetCDF();
 	
 	virtual int readNetCDF(const char* filename)=0;

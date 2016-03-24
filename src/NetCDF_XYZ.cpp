@@ -16,11 +16,12 @@
 #include <GeographicLib/TransverseMercatorExact.hpp>
 
 
-NetCDF_XYZ::NetCDF_XYZ()
-:NetCDF::NetCDF()
+NetCDF_XYZ::NetCDF_XYZ(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim)
+:NetCDF::NetCDF(metFile_idim, metFile_jdim, metFile_kdim)
  {
-  NLON = NX;
-  NLAT = NY; 
+  NLON = metFile_idim;
+  NLAT = metFile_jdim;
+  NALT = metFile_kdim; 
    
   longitude = new float [NLON];
 	latitude = new float [NLAT];
@@ -40,16 +41,6 @@ NetCDF_XYZ::NetCDF_XYZ()
 	thetarhobar = new float[NALT*NLON*NLAT];	
   dpibardx = new float[NALT*NLON*NLAT];	
   dpibardy = new float[NALT*NLON*NLAT];	
-  pip = new float[NALT*NLON*NLAT];	
-  radius = new float[NALT*NLON*NLAT];	
-  vtbar = new float[NALT*NLON*NLAT];	
-  uprime = new float[NALT*NLON*NLAT];	
-  vprime = new float[NALT*NLON*NLAT];	
-
-  dpiprimedx = new float[NALT*NLON*NLAT];	
-  dpiprimedy = new float[NALT*NLON*NLAT];	   
-  dpiprimedz = new float[NALT*NLON*NLAT];	   
-	thetarhoprime = new float[NALT*NLON*NLAT];	 
    
  }
  
@@ -73,23 +64,13 @@ NetCDF_XYZ::~NetCDF_XYZ()
   delete[] thetarhobar;
   delete[] dpibardx;
   delete[] dpibardy;
-  delete[] pip;
-  delete[] radius;
-  delete[] vtbar;
-  delete[] uprime;
-  delete[] vprime;
- 
-  delete[] dpiprimedx;
-  delete[] dpiprimedy; 
-  delete[] dpiprimedz; 
-  delete[] thetarhoprime;
 
 }
 
 int NetCDF_XYZ::readNetCDF(const char* filename) {
 	NcError err(NcError::verbose_nonfatal);
     NcFile dataFile(filename, NcFile::ReadOnly);
-     
+
     if(!dataFile.is_valid())
     	return NC_ERR;
      
@@ -111,7 +92,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     	return NC_ERR;
 
      // Get pointers to the pressure and temperature variables.
-    NcVar *uVar,*vVar,*wVar,*dudxVar,*dvdxVar,*dwdxVar,*dudyVar,*dvdyVar,*dwdyVar,*dudzVar,*dvdzVar,*dwdzVar, *trbVar, *dpibdxVar, *dpibdyVar, *pipVar, *rVar, *vtbVar, *upVar, *vpVar, *trpVar, *dpipdxVar, *dpipdyVar, *dpipdzVar;
+    NcVar *uVar,*vVar,*wVar,*dudxVar,*dvdxVar,*dwdxVar,*dudyVar,*dvdyVar,*dwdyVar,*dudzVar,*dvdzVar,*dwdzVar, *trbVar, *dpibdxVar, *dpibdyVar;
 
     if (!(uVar = dataFile.get_var("u")))
     	return NC_ERR;
@@ -143,25 +124,6 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     	return NC_ERR; 
     if (!(dpibdyVar = dataFile.get_var("dpibdy")))
     	return NC_ERR; 
-    if (!(pipVar = dataFile.get_var("pip")))
-    	return NC_ERR; 
-    if (!(rVar = dataFile.get_var("r")))
-    	return NC_ERR;       
-    if (!(vtbVar = dataFile.get_var("vtb")))
-    	return NC_ERR;       
-    if (!(upVar = dataFile.get_var("up")))
-    	return NC_ERR;       
-    if (!(vpVar = dataFile.get_var("vp")))
-    	return NC_ERR; 
-      
-    if (!(dpipdxVar = dataFile.get_var("dpipdx")))
-    	return NC_ERR; 
-    if (!(dpipdyVar = dataFile.get_var("dpipdy")))
-    	return NC_ERR; 
-    if (!(dpipdzVar = dataFile.get_var("dpipdz")))
-    	return NC_ERR; 
-    //if (!(trpVar = dataFile.get_var("trp")))
-    //	return NC_ERR; 
                 	
     if (!uVar->set_cur(NREC, 0, 0, 0))
 		return NC_ERR;
@@ -192,25 +154,6 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     if (!dpibdxVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR; 
     if (!dpibdyVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR; 
-    if (!pipVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR; 
-    if (!rVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR;       
-    if (!vtbVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR;       
-    if (!upVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR;       
-    if (!vpVar->set_cur(NREC, 0, 0, 0))
-    	return NC_ERR; 
-
-    //if (!trpVar->set_cur(NREC, 0, 0, 0))
-    //return NC_ERR; 
-    if (!dpipdxVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR; 
-    if (!dpipdyVar->set_cur(NREC, 0, 0, 0))
-    return NC_ERR; 
-    if (!dpipdzVar->set_cur(NREC, 0, 0, 0))
     return NC_ERR; 
 											 
 	if (!uVar->get(u, 1, NALT, NLAT, NLON))
@@ -243,26 +186,7 @@ int NetCDF_XYZ::readNetCDF(const char* filename) {
     return NC_ERR; 
   if (!dpibdyVar->get(dpibardy, 1, NALT, NLAT, NLON))
     return NC_ERR; 
-  if (!pipVar->get(pip, 1, NALT, NLAT, NLON))
-    return NC_ERR; 
-  if (!rVar->get(radius, 1, NALT, NLAT, NLON))
-    return NC_ERR;       
-  if (!vtbVar->get(vtbar, 1, NALT, NLAT, NLON))
-    return NC_ERR;       
-  if (!upVar->get(uprime, 1, NALT, NLAT, NLON))
-    return NC_ERR;       
-  if (!vpVar->get(vprime, 1, NALT, NLAT, NLON))
-    return NC_ERR; 	
 
-  //if (!trpVar->get(thetarhoprime, 1, NALT, NLAT, NLON))
-  //  return NC_ERR; 
-  if (!dpipdxVar->get(dpiprimedx, 1, NALT, NLAT, NLON))
-    return NC_ERR; 
-  if (!dpipdyVar->get(dpiprimedy, 1, NALT, NLAT, NLON))
-    return NC_ERR; 
-  if (!dpipdzVar->get(dpiprimedz, 1, NALT, NLAT, NLON))
-    return NC_ERR; 
-									      
    return 0;
 }
 
@@ -312,25 +236,6 @@ double NetCDF_XYZ::getValue(const int &i,const int &j,const int &k, const QStrin
 	value_out= dpibardx[k*NLAT*NLON + j*NLAT + i]/1000.0;	
 	} else if (varName=="dpibdy") {
 	value_out= dpibardy[k*NLAT*NLON + j*NLAT + i]/1000.0;	 
-	} else if (varName=="pip") {
-	value_out= pip[k*NLAT*NLON + j*NLAT + i];	
-	} else if (varName=="r") {
-	value_out= radius[k*NLAT*NLON + j*NLAT + i]*1000.0;	
-	} else if (varName=="vtb") {
-	value_out= vtbar[k*NLAT*NLON + j*NLAT + i];	
-	} else if (varName=="up") {
-	value_out= uprime[k*NLAT*NLON + j*NLAT + i];	
-	} else if (varName=="vp") {
-	value_out= vprime[k*NLAT*NLON + j*NLAT + i];	
- 
-	} else if (varName=="dpipdx") {
-	value_out= dpiprimedx[k*NLAT*NLON + j*NLAT + i]/1000.0;	
-	} else if (varName=="dpipdy") {
-	value_out= dpiprimedy[k*NLAT*NLON + j*NLAT + i]/1000.0;	  
-	} else if (varName=="dpipdz") {
-	value_out= dpiprimedz[k*NLAT*NLON + j*NLAT + i]/1000.0;
-	} else if (varName=="trp") {
-	value_out= thetarhoprime[k*NLAT*NLON + j*NLAT + i];	 
         } else if (varName=="A") {
         value_out= this->calc_A(i,j,k); 
         } else if (varName=="B") {
@@ -415,7 +320,7 @@ double NetCDF_XYZ::calc_D(const int &i,const int &j,const int &k)
   float c_p = 1005.7;
   float g = 9.81;  
 
- if (thetarhobar==-999 or dAdz==-999 or dCdx==-999){
+ if (thetarhobar==-999 or dAdz==-999000 or dCdx==-999000){
     return -999;}
 
   double d = (dAdz-dCdx)*thetarhobar*thetarhobar*(-c_p/g);
@@ -431,7 +336,7 @@ double NetCDF_XYZ::calc_E(const int &i,const int &j,const int &k)
   float	c_p = 1005.7;
   float	g = 9.81;
   
- if (thetarhobar==-999 or dBdz==-999 or dCdy==-999){
+ if (thetarhobar==-999 or dBdz==-999000 or dCdy==-999000){
     return -999;}
 
   double e = (dBdz-dCdy)*thetarhobar*thetarhobar*(-c_p/g);

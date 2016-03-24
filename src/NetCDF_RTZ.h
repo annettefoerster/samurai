@@ -19,7 +19,8 @@ class NetCDF_RTZ : public NetCDF
 {
 
 public:
-	NetCDF_RTZ();
+
+        NetCDF_RTZ(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim);
   ~NetCDF_RTZ();
   
   int readNetCDF(const char* filename);

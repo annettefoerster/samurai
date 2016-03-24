@@ -14,14 +14,15 @@
 #include <iostream>
 #include <QString>
 
-NetCDF::NetCDF() :c_p(1005.7), g(9.81), f(5.85e-05), pi(3.14159265358979323846)
+NetCDF::NetCDF(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim) :c_p(1005.7), g(9.81), f(5.85e-05), pi(3.14159265358979323846)
  {
 	NDIMS = 4;
-	NALT = 33;
-	NX = 151;      // NRADIUS or NLON
-	NY = 151;      // NTHETA or NLAT
+	NALT = metFile_kdim;
+	NX = metFile_idim;      // NRADIUS or NLON
+	NY = metFile_jdim;      // NTHETA or NLAT
 	NREC = 0;
 	NC_ERR = 2;
+   
   std::cout << "Constructor \n";
 }
 

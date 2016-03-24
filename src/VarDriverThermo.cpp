@@ -171,10 +171,12 @@ bool VarDriverThermo::initialize(const QDomElement& configuration)
     		
 	/* Optionally load a set of background estimates and interpolate to the Gaussian mish */
 	
-	//QString metFile = "20050921_18.nc";
 	metFile = configHash.value("infile");
-	
-	if(!this->loadObservations(metFile, &obVector)) {
+        metFile_idim = configHash.value("infile_idim").toInt(); 
+        metFile_jdim = configHash.value("infile_jdim").toInt();
+        metFile_kdim = configHash.value("infile_kdim").toInt();       
+
+	if(!this->loadObservations(metFile,metFile_idim,metFile_jdim,metFile_kdim, &obVector)) {
 	// For testing purposes, comment out line above and use this one instead: if(!this->testing(&obVector)) {
 				cout << "Loading Observations failed ...Exit." << endl;
 				return EXIT_FAILURE;
@@ -267,15 +269,14 @@ bool VarDriverThermo::finalize()
 	return true;
 }
 
-
-bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obVector)
+bool VarDriverThermo::loadObservations(QString& metFile,const int &metFile_idim,const int &metFile_jdim,const int &metFile_kdim , QList<Observation>* obVector)
 {  
     if (runMode == XYZ) {
-    ncFile = new NetCDF_XYZ();
+    ncFile = new NetCDF_XYZ(metFile_idim,metFile_jdim,metFile_kdim);
   } else if (runMode == RTZ) {
-    ncFile = new NetCDF_RTZ();
+    ncFile = new NetCDF_RTZ(metFile_idim,metFile_jdim,metFile_kdim);
   }
-  
+
   cout << "Read in NetCDF File ... " << endl;
   if (ncFile->readNetCDF(metFile.toAscii().data()) != 0) {
 	  cout << "Error reading NetCDF file\n";
@@ -284,10 +285,10 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
  
   cout << "Load Observations ... " << endl;
   
-  int nalt = 33;
-  int nx = 151;
-  int ny = 151;
-  
+  int nalt = metFile_kdim;
+  int nx = metFile_idim;
+  int ny = metFile_jdim;
+
   QString file,datestr,timestr;
   file = metFile.section("/",-1);  
   datestr = file.left(8);
@@ -296,6 +297,8 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
   QTime time;
   if (timestr.size()==2) {
     time = QTime::fromString(timestr, "HH");
+  } else if (timestr.size()==4) {
+    time = QTime::fromString(timestr,"HHmm");
   } else {
     std::cout << "Implement reading routine for filenames which don't look like yyyymmdd_hh.nc \n";
     exit(1);
@@ -315,115 +318,17 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
   }  
 		  
   if (configHash.value("mode") == "RTZ") {
-    cout << "Entered RTZ run mode " << endl;
-    int nradius = nx;
-    int ntheta = ny;
-    
-    for (int i = 0; i < nradius; ++i) {
-      for (int j = 0; j < ntheta; ++j) {
-        for (int k = 0; k < nalt; ++k) {
-          Observation varOb;
-          
-      double r = ncFile->getValue(i,j,k,(QString)"R");
-      double r_km = r/1000.0;
-      double lambda = ncFile->getValue(i,j,k,(QString)"LAMBDA");
-      double alt = ncFile->getValue(i,j,k,(QString)"Z");
-      double alt_km = alt/1000.0;
-
-          if ((r_km < imin) or (r_km > imax) or
-              (lambda < jmin) or (lambda > jmax) or
-              (alt_km < kmin) or (alt_km > kmax))
-              continue;
-      if (r_km == 0.0) continue;
-
-      varOb.setType(101);
-      varOb.setRadius(r_km);
-      varOb.setTheta(lambda);
-      varOb.setAltitude(alt_km);
-      varOb.setTime(obTime.toTime_t());
-      
-      // Initialize the weights
-      for (unsigned int var = 0; var < numVars; ++var) {
-          for (unsigned int d = 0; d < numDerivatives; ++d) {
-              varOb.setWeight(0.0, var, d);
-          }
-      }
-      
-      double a,b,c,d;                    
-                          
-      a = ncFile->calc_A(i,j,k);
-      b = ncFile->calc_B(i,j,k);
-      c = ncFile->calc_C(i,j,k);
-      d = ncFile->calc_D(i,j,k);
-
-      double thetarhobar = ncFile->getValue(i,j,k,(QString)"THETARHOBAR");
-      double dpibardr = ncFile->getDerivative(i,j,k,(QString)"PIBAR",1);
-      double thetarhop = ncFile->getValue(i,j,k,(QString)"THETARHOP");
-      double dpipdr = ncFile->getDerivative(i,j,k,(QString)"PIP",1);
-      double dpipdlambda = ncFile->getDerivative(i,j,k,(QString)"PIP",2);
-      double dpipdz = ncFile->getDerivative(i,j,k,(QString)"PIP",3);
-      double dtrpdr = ncFile->getDerivative(i,j,k,(QString)"THETARHOP",1);
-      double dtrpdlambda = ncFile->getDerivative(i,j,k,(QString)"THETARHOP",2);
-      double dtrpdz = ncFile->getDerivative(i,j,k,(QString)"THETARHOP",3);
-      
-      double u = ncFile->getValue(i,j,k,(QString)"U");
-      double v = ncFile->getValue(i,j,k,(QString)"V");
-      double w = ncFile->getValue(i,j,k,(QString)"W");
-      float c_p = 1005.7;
-      float g = 9.81;
-      
-      double scaling = 1000.0;
-          
-      varOb.setOb(a*scaling);
-      varOb.setWeight(-c_p*dpibardr*scaling,1,0);
-      varOb.setWeight(-c_p*thetarhobar*scaling/1000.0,0,1);		
-      varOb.setError(configHash.value("thermo_A_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,0);
-      varOb.setWeight(0,0,1);
-      
-      varOb.setOb(b*scaling);
-      varOb.setWeight(-c_p*thetarhobar*180.0*scaling/(Pi*r),0,2);		
-      varOb.setError(configHash.value("thermo_B_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,0,2);
-      
-      varOb.setOb(c*scaling);
-      varOb.setWeight(g/thetarhobar*scaling,1,0);
-      varOb.setWeight(-c_p*thetarhobar*scaling/1000.0,0,3);		
-      varOb.setError(configHash.value("thermo_C_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,0);
-      varOb.setWeight(0,0,3);
-
-      varOb.setOb(d*scaling);
-      varOb.setWeight(u/1000.0*scaling,1,1);
-      varOb.setWeight(v*180.0*scaling/(r*Pi),1,2);	
-      varOb.setWeight(w/1000.0*scaling,1,3);		
-      varOb.setWeight(-scaling,2,0);		
-      varOb.setError(configHash.value("thermo_D_error").toFloat());
-      obVector->push_back(varOb);
-      varOb.setWeight(0,1,1);
-      varOb.setWeight(0,1,2);	
-      varOb.setWeight(0,1,3);		
-      varOb.setWeight(0,2,0);			
-
-        }
-      }
-    }
+    cout << "RTZ run mode not implemented yet " << endl;
    
   } else if (configHash.value("mode") == "XYZ") {
     std::cout << "Entered XYZ run mode " << endl;
     
     int nlon = nx;
     int nlat = ny;
-    ////for (int i = 40; i < nlon; ++i) {
-    ////  for (int j = 30; j < nlat; ++j) {
-    ////    for (int k = 1; k < 20; ++k) {
+    for (int i = 0; i < nlon; ++i) {
+      for (int j = 0; j < nlat; ++j) {
+        for (int k = 0; k < nalt; ++k) {
    
-    for (int i = 0; i < 151; ++i) {         // 0,151
-      for (int j = 0; j < 151; ++j) {
-        for (int k = 0; k < 31; ++k) {     //0,31
           Observation varOb;
           
       double lon = ncFile->getValue(i,j,k,(QString)"lon");
@@ -466,6 +371,7 @@ bool VarDriverThermo::loadObservations(QString& metFile, QList<Observation>* obV
       c = ncFile->calc_C(i,j,k);
       d = ncFile->calc_D(i,j,k);
       e = ncFile->calc_E(i,j,k);
+
 
       double thetarhobar = ncFile->getValue(i,j,k,(QString)"trb");
       

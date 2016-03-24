@@ -15,8 +15,9 @@
 #include <QString>
 #include <cstdlib>
 
-NetCDF_RTZ::NetCDF_RTZ()
-:NetCDF::NetCDF()
+
+NetCDF_RTZ::NetCDF_RTZ(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim)
+:NetCDF::NetCDF(metFile_idim, metFile_jdim, metFile_kdim)
  {
 	NRADIUS = NX;
 	NTHETA = NY;

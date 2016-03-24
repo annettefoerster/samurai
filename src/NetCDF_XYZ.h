@@ -19,7 +19,8 @@ class NetCDF_XYZ : public NetCDF
 {
 
 public:
-	NetCDF_XYZ();
+        NetCDF_XYZ(const int& metFile_idim, const int& metFile_jdim, const int& metFile_kdim);
+
   ~NetCDF_XYZ();
   
   int readNetCDF(const char* filename);
@@ -52,16 +53,6 @@ protected:
   float* thetarhobar;
 	float* dpibardx;
 	float* dpibardy;
-	float* pip;
-	float* radius;
-	float* vtbar;
-  float* uprime;
-  float* vprime;
-  
-  float* dpiprimedx;
-  float* dpiprimedy; 
-  float* dpiprimedz; 
-  float* thetarhoprime;
 	  
 	QString varName;  
 	
