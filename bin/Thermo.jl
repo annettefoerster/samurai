@@ -13,9 +13,9 @@ using DataArrays
 using Grid
 
 
-export  uv_to_vrvt, calc_mean_single, calc_profile_vars, calc_balanced_profile,
+export  uv_to_vrvt,vrvt_to_uv, calc_mean_single,calc_mean_single_RTZ, calc_profile_vars, calc_balanced_profile,
         calc_horizontal_derivatives, calc_vertical_derivative, dict_to_array, read_nc_var,
-        write_additional_variables, create_mask_nan, create_mask_value, regrid_r_to_xy
+        write_additional_variables, create_mask_nan, create_mask_value, regrid_r_to_xy, regrid_rtz_to_xyz, BCnan, InterpLinear, CoordInterpGrid
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -51,6 +51,36 @@ function uv_to_vrvt(u,v,x,y,centerX,centerY)
     end
   end
   return vr,vt,radius,azimuth
+end
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function vrvt_to_uv(vr,vt,radius,azimuth)
+###Convert vr and vt into u and v
+  println("Convert to u/v ...")
+
+  d1,d2,d3,d4 = size(vr)
+
+  # Initialize
+  u    = similar(vr); fill!(u, -999)
+  v    = similar(vr); fill!(v, -999)
+  x    = similar(vr); fill!(x, -999)
+  y    = similar(vr); fill!(y, -999)
+
+  for k in 1:1:d3
+    for j in 1:1:d2
+      for i in 1:1:d1
+        x[i,j,k] = radius[i] * cos(azimuth[j]./180.0.*pi)
+        y[i,j,k] = radius[i] * sin(azimuth[j]./180.0.*pi)
+
+        if vr[i,j,k] != -999
+          u[i,j,k] = vr[i,j,k] * cos(azimuth[j]./180.0.*pi)  - vt[i,j,k] * sin(azimuth[j]./180.0.*pi)
+          v[i,j,k] = vr[i,j,k] * sin(azimuth[j]./180.0.*pi)  + vt[i,j,k] * cos(azimuth[j]./180.0.*pi)
+        end
+      end
+    end
+  end
+  return u,v,x,y
 end
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,6 +148,47 @@ function calc_mean_single(vt,x,y,z,centerX,centerY)
       if hwt > 0
         vt_mean[convert(Float64,z[k])][convert(Float64,r)] = sum_vt/hwt
       end
+    end
+  end
+
+  return vt_mean,radii
+end
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function calc_mean_single_RTZ(vt,radius,azimuth,z)
+  println("Calculate mean state in rz-coordinates ...")
+
+  d1,d2,d3 = size(vt)
+
+###Azimuthal mean
+  radii = radius
+
+  vt_mean = OrderedDict()
+  for k in z
+    k_idx = convert(Float64,k)
+    vt_mean[k_idx] = OrderedDict()
+    for r in radii
+      r_idx = convert(Float64,r)
+      vt_mean[k_idx][r_idx] = -999
+    end
+  end
+
+  for k in 1:d3
+    for i in 1:d1
+      r = radii[i]
+      sum_vt = 0
+      hwt = 0
+      for j in 1:d2
+        if (vt[i,j,k] != -999 && !isnan(vt[i,j,k]))     # need to handle missing data better!
+          hwt += 1
+          sum_vt += vt[i,j,k]
+        end
+      end
+
+      if hwt > 0
+        vt_mean[convert(Float64,z[k])][convert(Float64,r)] = sum_vt/hwt
+      end
+
     end
   end
 
@@ -248,8 +319,8 @@ end
 function calc_horizontal_derivatives(pibar,x,y)
   println("Calculate horizontal derivatives ...")
 
-  dpibardx = similar(pibar); fill!(dpibardx, -999)
-  dpibardy = similar(pibar); fill!(dpibardy, -999)
+  dpibardx = similar(pibar); fill!(dpibardx, -999.0)
+  dpibardy = similar(pibar); fill!(dpibardy, -999.0)
 
   #d1,d2,d3,d4 = size(pibar)
   d1,d2,d3 = size(pibar)
@@ -260,29 +331,29 @@ function calc_horizontal_derivatives(pibar,x,y)
     for j in 1:d2
       for i in 1:d1
         if i == 1
-          if pibar[i,j,k] != -999 && pibar[i+1,j,k] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i+1,j,k] != -999.0
             dpibardx[i,j,k] = (pibar[i+1,j,k]-pibar[i,j,k])/dx
           end
         elseif i == d1
-          if pibar[i,j,k] != -999 && pibar[i-1,j,k] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i-1,j,k] != -999.0
             dpibardx[i,j,k] = (pibar[i,j,k]-pibar[i-1,j,k])/dx
           end
         else
-          if pibar[i-1,j,k] != -999 && pibar[i+1,j,k] != -999
+          if pibar[i-1,j,k] != -999.0 && pibar[i+1,j,k] != -999.0
             dpibardx[i,j,k] = (pibar[i+1,j,k]-pibar[i-1,j,k])/(2*dx)
           end
         end
 
         if j == 1
-          if pibar[i,j,k] != -999 && pibar[i,j+1,k] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i,j+1,k] != -999.0
             dpibardy[i,j,k] = (pibar[i,j+1,k]-pibar[i,j,k])/dy
           end
         elseif j == d2
-          if pibar[i,j,k] != -999 && pibar[i,j-1,k] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i,j-1,k] != -999.0
             dpibardy[i,j,k] = (pibar[i,j,k]-pibar[i,j-1,k])/dy
           end
         else
-          if pibar[i,j-1,k] != -999 && pibar[i,j+1,k] != -999
+          if pibar[i,j-1,k] != -999.0 && pibar[i,j+1,k] != -999.0
             dpibardy[i,j,k] = (pibar[i,j+1,k]-pibar[i,j-1,k])/(2*dy)
           end
         end
@@ -299,23 +370,23 @@ end
 function calc_vertical_derivative(pibar,z)
   println("Calculate vertical derivative ...")
 
-  dpibardz = similar(pibar); fill!(dpibardz, -999)
-  d1,d2,d3,d4 = size(pibar)
+  dpibardz = similar(pibar); fill!(dpibardz, -999.0)
+  d1,d2,d3 = size(pibar)
   dz = (z[2]-z[1])
 
   for k in 1:d3
     for j in 1:d2
       for i in 1:d1
         if k == 1
-          if pibar[i,j,k] != -999 && pibar[i,j,k+1] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i,j,k+1] != -999.0
             dpibardz[i,j,k] = (pibar[i,j,k+1]-pibar[i,j,k])/dz
           end
         elseif k == d3
-          if pibar[i,j,k] != -999 && pibar[i,j,k-1] != -999
+          if pibar[i,j,k] != -999.0 && pibar[i,j,k-1] != -999.0
             dpibardz[i,j,k] = (pibar[i,j,k]-pibar[i,j,k-1])/dz
           end
         else
-          if pibar[i,j,k-1] != -999 && pibar[i,j,k+1] != -999
+          if pibar[i,j,k-1] != -999.0 && pibar[i,j,k+1] != -999.0
             dpibardz[i,j,k] = (pibar[i,j,k+1]-pibar[i,j,k-1])/(2*dz)
           end
         end
@@ -499,7 +570,6 @@ end
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 function regrid_r_to_xy(r,field1D,x,y)
   ### calculate r values corresponding to the xy values
 
@@ -521,3 +591,89 @@ function regrid_r_to_xy(r,field1D,x,y)
 end
 
 end
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function create_lat_lon_arrays(center_lat,center_lon,x,y)
+    ### This uses equations from samurai_lineartrack.pl
+    lat  = similar(x); fill!(lat, NaN)
+    lon  = similar(x); fill!(lon, NaN)
+
+    latrad = center_lat *pi/180.0
+    fac_lat = 111.13209-0.56605*cos(2.0*latrad)+0.00012*cos(4.0*latrad)-0.000002*cos(6.0*latrad);
+    fac_lon = 111.41513*cos(latrad)-0.09455*cos(3.0*latrad)+0.00012*cos(5.0*latrad);
+
+    for i in 1:1:length(x)
+        lon[i] = center_lon + x[i]/fac_lon
+        lat[i] = center_lat + y[i]/fac_lat;
+    end
+
+    return lat,lon
+end
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function regrid_rtz_to_xyz(r,t,z,field,x,y,bc,interp)
+    ### Copied from regrid.jl
+    field_new = zeros(Float64,(length(x),length(y),length(z)))
+    for (index,alt) in enumerate(z)
+        field_new[:,:,index] = regrid_rt_to_xy(r,t,field[:,:,index],x,y,bc,interp)
+    end
+    return field_new
+end
+
+function regrid_rt_to_xy(r,t,field,x,y,bc,interp)
+  ### Copied from regrid.jl
+  ### calculate rt values corresponding to the xy values
+  x_2d,y_2d = grid_2d(x,y)
+  r_cartesian = sqrt(x_2d.^2 .+ y_2d.^2)
+  az_cartesian = atan2(y_2d,x_2d)./pi .*180.0
+
+  for i in 1:1:length(x)
+      for j in 1:1:length(y)
+          if az_cartesian[i,j] < 0.0
+              az_cartesian[i,j] = az_cartesian[i,j] + 360.0
+          end
+      end
+  end
+
+  ### Interpolate in R-Az-space to the r and az values of the cartesian grid
+  r_range = r[1]:(r[2]-r[1]):r[end]
+  t_range = t[1]:(t[2]-t[1]):t[end]
+  field_interp = interp2D_non_regular_grid(r_range,t_range,field,r_cartesian,az_cartesian,bc,interp)
+  return field_interp
+end
+
+function interp2D_non_regular_grid(x,y,field,x_new,y_new,bc,interp)
+  ### x_new and y_new have to be 2D arrays
+  ###interp options: InterpNearest, InterpLinear, InterpQuadratic, InterpCubic
+  ###bc options: BCnil,BCnan,BCreflect,BCperiodic,BCnearest,BCfill
+
+    field_interp = CoordInterpGrid((x,y), field, bc, interp);
+    field_new = zeros(Float64,size(x_new))
+
+    ### Interpolate to new grid
+    for i in 1:1:size(x_new)[1]
+      for j in 1:1:size(x_new)[2]
+        field_new[i,j] = field_interp[x_new[i,j],y_new[i,j]]
+      end
+    end
+    return field_new
+end
+
+function grid_2d(x,y)
+  ### same as meshgrid
+    dim1 = length(x)
+    dim2 = length(y)
+    x_2d = ones(Float64,(dim1,dim2))
+    y_2d = ones(Float64,(dim1,dim2))
+    for i in 1:1:dim1
+       x_2d[i,:] = x[i]
+    end
+    for j in 1:1:dim2
+        y_2d[:,j] = y[j]
+    end
+    return x_2d,y_2d
+end
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
